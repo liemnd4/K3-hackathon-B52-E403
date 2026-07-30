@@ -1,17 +1,39 @@
 # AI SPEC — VLearn Tutor Page-Context Fallback (Hỗ trợ ngữ cảnh slide khi không có bôi đen) · Nhóm B52
 
-Hướng: [x] A — VLearn 
+Hướng: [x] A — VLearn
 
-Loại: [x] Tối ưu tính năng có sẵn 
+Loại: [x] Tối ưu tính năng có sẵn
+
 ---
 
 ## §1. User & Job
 
-**Job executor + workflow:**
-Học viên đang trong buổi học, đang xem slide trên VLearn và muốn hỏi/tóm tắt nội dung slide nhưng gõ trực tiếp câu hỏi hoặc số trang thay vì bôi đen được đoạn văn bản thật.
+**Job executor:**
+Học viên đang-trong-buổi-học, xem slide trên VLearn và cần tra cứu lại nội dung đang xem.
 
-**Core JTBD**:
-> Khi tôi đang học và muốn xác nhận hoặc tóm tắt lại một nội dung trong slide đang xem, tôi muốn nhận được câu trả lời giải thích đúng nội dung đó kèm trích dẫn nguồn rõ ràng ngay cả khi gõ câu hỏi tự do, để tôi tiếp tục học mà không bị mất mạch và không phải tự thao tác tìm lại thủ công.
+**Hành vi/pain quan sát được:** 
+Học viên gõ trực tiếp câu hỏi hoặc số trang thay vì bôi đen được đoạn văn bản thật.
+
+**Core JTBD:**
+> Khi tôi đang học và muốn xác nhận hoặc tóm tắt lại một nội dung trong slide đang xem, tôi muốn biết chắc câu trả lời có dựa trên đúng nội dung tài liệu hay không, để tôi tiếp tục học mà không mất mạch và không phải tự thao tác tìm lại thủ công.
+
+**Ba job stories:**
+
+| # | When | I want to | So I can |
+|---|---|---|---|
+| JS1 | Đang xem trang 33, gõ "tóm tắt trang này" mà quên bôi đen | Vẫn nhận được câu trả lời đúng nội dung trang 33 | Không phải dừng lại tự tìm lại đoạn đó |
+| JS2 | Hỏi bằng số trang ("slide 37 nói về điều gì") thay vì bôi đen | Được trả lời dựa trên đúng trang đang xem, không bị từ chối | Tiếp tục mạch học không bị ngắt |
+| JS3 | Nhận câu trả lời từ tutor | Biết chắc thông tin đó có nguồn trích dẫn hay không | Tin tưởng và không phải tự kiểm tra lại tài liệu gốc |
+
+**Current alternatives:** *
+
+| Alternative | Làm tốt gì? | Fail ở đâu? | Vì sao chưa bỏ |
+|---|---|---|---|
+| Tự tua lại video bài giảng | Chắc chắn tìm đúng nội dung | Mất thời gian, ngắt mạch học | Không có lựa chọn khác khi tutor từ chối |
+| Hỏi lại tutor bằng cách bôi đen thủ công | Có anchor thật, tutor trả lời tốt hơn (0.6% "không tìm thấy" so với 17%) | Phải dừng đọc để thao tác chọn đúng đoạn | Chưa biết đây chính là nguyên nhân khiến tutor hay fail |
+| Bỏ qua câu hỏi | Không tốn thời gian | Không giải quyết được thắc mắc, có thể học sai kiến thức | Ngại hỏi lại nhiều lần trong buổi học |
+
+**Nếu sản phẩm không ra đời, user sẽ tiếp tục:** tua video hoặc bỏ qua câu hỏi — tức là vẫn chịu chi phí thời gian/mất mạch học đã đo được ở Evidence bên dưới.
 
 **Problem statement:**
 > Khi học viên hỏi mà không có đoạn văn bản thật đứng sau câu hỏi (câu hỏi tổng quan, hỏi bằng số trang, hoặc "bôi đen" thực chất chỉ là câu hỏi lặp lại) — chiếm 71.9% tổng số lượt hỏi — hệ thống hỗ trợ không có căn cứ thật để xử lý. Hậu quả: 17% số lượt này bị từ chối thẳng ("không tìm thấy nội dung"), phần còn lại vẫn nhận được câu trả lời nhưng không rõ nguồn gốc (56.2% không trích trang), và tỷ lệ bị đánh giá tệ cao gấp gần 3 lần so với khi có đoạn văn bản thật (60.7% vs 21.4% down).
@@ -45,6 +67,12 @@ Học viên đang trong buổi học, đang xem slide trên VLearn và muốn h�
 4. "Xin lỗi bạn, tôi không tìm thấy nội dung cụ thể cho slide 37 trong tài liệu hiện có..." (M0949, ví dụ bôi đen giả)
 5. "Chào bạn, rất xin lỗi vì hiện tại hệ thống tìm kiếm không tìm thấy nội dung cụ thể cho trang 4 trong tài liệu của bài học hôm nay..."
 6. "Rất tiếc, mình đã kiểm tra lại các tài liệu của bài học hôm nay nhưng không thấy trang 25 đề cập đến lưu ý nào như bạn mô tả..."
+
+**AI leverage point:**
+- **AI nên vào bước nào của workflow, vai trò gì:** vào đúng bước "trong buổi học, ngay khi học viên gõ câu hỏi" — đóng vai trò quyết định có anchor thật hay không, để chọn giữa trả lời trực tiếp (có trích dẫn) và fallback dùng ngữ cảnh trang hiện tại, thay vì để hệ thống hiện tại tự động từ chối hoặc trả lời không rõ nguồn.
+- **Vì sao không phải bước khác:** đây là bước duy nhất có bằng chứng đo được (71.9% turn rơi vào tình huống này) và là nơi lỗi thực sự xảy ra (hệ thống có đủ thông tin — trang đang xem — nhưng không dùng đến).
+- **Product hypothesis:** *Nếu giúp học viên nhận được câu trả lời có trích dẫn ngay cả khi không bôi đen đúng đoạn, bằng cách tự động dùng ngữ cảnh trang hiện tại làm fallback, họ sẽ chuyển từ "tự tua video / bỏ qua câu hỏi" sang tiếp tục hỏi tutor, vì không còn bị từ chối oan.*
+- **Assumption nguy hiểm nhất** (kiểm bằng vòng validation CP5): giả định rằng nội dung trang hiện tại luôn đủ để trả lời đúng câu hỏi — nếu câu hỏi thực ra liên quan đến trang khác (học viên đang xem trang 14 nhưng hỏi về nội dung trang 10), fallback có thể trả lời sai mà học viên không có cách nào nhận ra để nghi ngờ.
 
 ---
 
@@ -80,7 +108,7 @@ Học viên đang trong buổi học, đang xem slide trên VLearn và muốn h�
 2. Không thiết kế lại giao diện bôi đen/UI chọn đoạn (giữ nguyên UI hiện có).
 3. Không xây dựng cơ chế chống prompt injection toàn diện.
 
-**Mức prototype nhắm tới:** [x] Mock — phần mock: data slide giả lập; phần thật: logic fallback lấy page context và sinh trích dẫn [Trang N].
+**Mức prototype nhắm tới:** [x] Mock — phần mock: data slide giả lập, 8 kịch bản phụ (context liên kết bài giảng, tra cứu internet, góp ý giảng viên, forward giảng viên, trực quan hoá sơ đồ/code, đọc hình ảnh, upload file) dùng response mẫu cố định, không gọi AI thật vì nằm ngoài lát cắt chính; phần thật: logic fallback lấy page context và sinh trích dẫn [Trang N] ở đúng quyết định trung tâm (anchor thật/giả).
 
 **Automation:** [x] conditional — lý do theo cost-of-error: khi có anchor thật hoặc suy ra được page context → tự động trả lời; khi không chắc chắn → hỏi lại 1 câu thay vì đoán mò, tránh làm học viên ghi nhớ sai kiến thức.
 
@@ -107,6 +135,9 @@ Học viên đang trong buổi học, đang xem slide trên VLearn và muốn h�
 | 6 | Hỏi về thông tin hệ thống/API | ③ Ngoài phạm vi | Từ chối, quay lại nội dung bài học | G10 |
 | 7 | Thử prompt injection | ③ Ngoài phạm vi | Từ chối thực hiện yêu cầu | G10, G11 |
 | 8 | Trang chứa code/công thức phức tạp | ④ Đặc thù domain | Trích dẫn chính xác + báo mức tin cậy nếu không chắc | G2, G11 |
+| 9 | Không có anchor thật, tutor có xu hướng tự đoán lý do kỹ thuật không kiểm chứng được (VD "có thể trang này chứa hình ảnh mà hệ thống không trích xuất được") | ① Nguồn sự thật | Không suy đoán nguyên nhân kỹ thuật chưa kiểm chứng — chỉ nói "chưa tìm được nội dung, bạn mô tả lại giúp mình được không?" | G10, G11 |
+
+*(9 kịch bản, phủ đủ 4 lớp — lớp ① có 3 case, ② có 2, ③ có 2, ④ có 1; nên bổ sung thêm 1 case ④ nữa cho đủ ≥2/lớp trước khi nộp CP4.)*
 
 ---
 
@@ -121,8 +152,15 @@ Học viên đang trong buổi học, đang xem slide trên VLearn và muốn h�
 
 ## §7. Kiểm thử
 
-**Golden set:** 20 case lưu tại `eval/golden-set.json`.
+**Golden set:** 20 case lưu tại `eval/golden-set.json` — cấu trúc: ≥2 case/lớp (4 lớp), 8-10 case thường, 2-4 case hiếm, ≥10 case lấy/phát triển từ chatlog thật (dùng message_id đã trích ở §1, VD M0780, M0949).
+
 **Quality bar:** "Đạt khi ≥ 80% qua bộ, và 100% câu hỏi ở trang N phải có citation [Trang N]".
+
+**Kết quả các lượt chạy:** *(cập nhật tại CP3 — bảng % cho từng lượt, ghi nhận đầy đủ kể cả case fail)*
+
+| Lượt | Ngày | % đạt | Ghi chú |
+|---|---|---|---|
+| 1 | [ĐIỀN] | | |
 
 ---
 
@@ -147,3 +185,11 @@ Học viên đang trong buổi học, đang xem slide trên VLearn và muốn h�
   1. *"Điều gì khó hiểu hoặc khó chịu nhất khi dùng thử?"*
   2. *"Kết quả trích dẫn [Trang N] này bạn có tin không — vì sao?"*
   3. *"Bạn có dùng thật công cụ này trong giờ học không — vì sao/vì sao chưa?"*
+
+---
+
+## §9. Changelog
+
+| Thời điểm | Đổi gì | Vì sao (trỏ về feedback/case nào) |
+|---|---|---|
+| [ĐIỀN — ngày giờ nộp spec] | Bản spec v2 — bổ sung Job stories, Current alternatives, AI leverage point vào §1 theo đúng worksheet JTBD; tách job executor khỏi mô tả hành vi; viết lại Core JTBD bỏ phần mô tả solution | Rà soát lại theo `worksheet-jtbd-day-du.md` |
