@@ -125,20 +125,23 @@ Học viên đang trong buổi học, đang xem slide trên VLearn và muốn h�
 
 **Quality bar:** "Đạt khi ≥ 80.0% qua bộ, và 100% câu hỏi ở trang N phải có citation [Trang N]".
 
-**Kết quả các lượt chạy (Chi tiết lưu trong `eval/run-history.json`):**
+**Kết quả các lượt chạy (Chi tiết lưu trong `eval/run-history.json` và `eval/results_v2.md`):**
 
 | Lượt | Thời điểm | Tỷ lệ % Đạt | Ghi chú & Lỗi phát hiện |
 |:---:|:---:|:---:|---|
-| **Lượt 1** | 15:00 Ngày 1 | **95.0% (19/20)** | Vượt Quality Bar (80.0%). Chi tiết: 19/20 case pass. 1 case fail do chứa từ khóa "pdf" (M0168) bị hệ thống hiểu lầm thành yêu cầu download file ngoài phạm vi. |
+| **Lượt 1** | 15:00 Ngày 1 (CP3) | **95.0% (19/20)** | Vượt Quality Bar (80.0%). 19/20 case pass. 1 case fail (ID #18) do từ khóa "pdf" bị hệ thống hiểu lầm thành yêu cầu download file ngoài phạm vi. |
+| **Lượt 2** | 22:55 Ngày 1 (CP5) | **100.0% (20/20)** | Vượt Quality Bar (80.0%). Khắc phục phân loại từ khóa "pdf", phân biệt chính xác câu hỏi slide nội dung PDF vs yêu cầu tải file ngoài, kết hợp nhãn trích dẫn `[Trang N hiện tại]`. |
 
 ---
 
 ## §8. Phân công & kế hoạch
 
 **Willing users (≥3 tên):**
-1. Nguyễn Văn A (Học viên AI Thực Chiến)
-2. Trần Thị B (Học viên AI Thực Chiến)
-3. Lê Văn C (Học viên AI Thực Chiến)
+1. Nguyễn Thành Duy (Học viên AI Thực Chiến)
+2. Lê Trần Long (Học viên AI Thực Chiến)
+3. Vũ Bình Minh (Học viên AI Thực Chiến)
+4. Thạch Minh Quân (Học viên AI Thực Chiến)
+5. Nguyễn Minh Phúc (Học viên AI Thực Chiến)
 
 **Phân công có tên cụ thể:**
 - **Evidence & Mining (Phần bằng chứng §1-§2):** Nguyễn Đình Liêm - 01421, Nguyễn Hồng Yến - 01065
@@ -148,9 +151,20 @@ Học viên đang trong buổi học, đang xem slide trên VLearn và muốn h�
 - **Demo & Presentation (Slide & Demo live):** Cả nhóm tham gia trình bày (mỗi thành viên ≥1 phần)
 
 **Kế hoạch vòng validation CP5 (3 câu hỏi, ai log):**
-- Thực hiện phỏng vấn/test thử trên 3 Willing Users.
+- Thực hiện phỏng vấn/test thử trên 5 học viên ngoài nhóm.
 - Người thực hiện log feedback: Đỗ Trung Kiên & Nguyễn Văn Hưng.
 - 3 câu hỏi phỏng vấn:
   1. *"Điều gì khó hiểu hoặc khó chịu nhất khi dùng thử?"*
   2. *"Kết quả trích dẫn [Trang N] này bạn có tin không — vì sao?"*
   3. *"Bạn có dùng thật công cụ này trong giờ học không — vì sao/vì sao chưa?"*
+
+---
+
+## §9. Changelog & Thay đổi từ Validation
+
+- **Phiên bản 1 (CP3 - Lượt đo 1):** Chạy kiểm thử 20 case trên Golden Set tự xây, đạt tỷ lệ **19/20 (95.0%)**, vượt Quality Bar đặt ra (80.0%).
+- **Phiên bản 2 (CP5 - Lượt đo 2 - Sau Validation):**
+  - **Kết quả đo lượt 2:** Đạt tỷ lệ **20/20 (100.0%)**, sửa dứt điểm lỗi nhận diện từ khóa "pdf" ở case #18.
+  - **Thay đổi đã làm từ phản hồi user:** 
+    1. Cập nhật giao diện hiển thị cơ sở ngữ cảnh chọn "slide hiện tại" hay "toàn bộ slide" khi hỏi AI để hiểu đúng ngữ cảnh (theo phản hồi từ Lê Trần Long).
+    2. Cập nhật giao diện xem slide cho phép cuộn chuột (scroll) trực tiếp để chuyển trang thay vì phải bấm nút thủ công (theo phản hồi từ Vũ Bình Minh).
