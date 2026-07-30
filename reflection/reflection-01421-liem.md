@@ -6,6 +6,12 @@
 - Viết System Prompt và thiết kế quyết định trung tâm (anchor thật/giả)
 - Cập nhật spec.md §1–§9
 
+## AI hỗ trợ thế nào
+
+Tôi dùng AI để hỗ trợ phân loại dữ liệu, brainstorm edge case và tổ chức
+framework đánh giá. Tuy nhiên, việc lựa chọn insight, kiểm tra dữ liệu
+và quyết định tiêu chí cuối cùng đều do tôi tự thực hiện.
+
 ## Điều tôi học được
 Trước đây tôi nghĩ AI tệ là do model yếu. Sau khi phân tích chatlog thật, tôi thấy vấn đề thực ra là **thiếu ngữ cảnh (anchor)** — không phải do model. 79.5% lượt hỏi không bôi đen text nào, và 100% lượt bị đánh giá thấp đến từ nhóm này.
 
