@@ -47,13 +47,12 @@ const DAY_META = {
 
 const COURSE_DATA = [
   { id: "d1", label: "Day 1", count: 1, status: "ACTIVE", files: [
-      // pdfUrl trỏ tới file PDF thật trong data/ — Vite serve qua fs.allow: ['..']
       { id: "d1f1", name: "d1-slide-hackathon.pdf", pages: 0, day: "d1",
-        pdfUrl: "../data/vlearn-pack/slides/d1-slide-hackathon.pdf" },
+        pdfUrl: "/slides/d1-slide-hackathon.pdf" },
   ]},
   { id: "d2", label: "Day 2", count: 1, status: "ACTIVE", files: [
       { id: "d2f1", name: "d2-slide-hackathon.pdf", pages: 0, day: "d2",
-        pdfUrl: "../data/vlearn-pack/slides/d2-slide-hackathon.pdf" },
+        pdfUrl: "/slides/d2-slide-hackathon.pdf" },
   ]},
   { id: "d3", label: "Day 3", count: 2, status: "ACTIVE", files: [
       { id: "d3f1", name: "day03-tu-chatbot-den-agentic-agent.pdf", pages: 46, day: "d3" },
