@@ -1,0 +1,137 @@
+# AI SPEC — VLearn Tutor Page-Context Fallback (Hỗ trợ ngữ cảnh slide khi không có bôi đen) · Nhóm [XX] · Zone [X]
+
+Hướng: [x] A — VLearn  [ ] B — Trợ lý Học viên  [ ] C — Làn mở
+Loại: [x] Tối ưu tính năng có sẵn  [ ] Tính năng mới
+
+---
+
+## §1. User & Job
+
+**Job executor + workflow:**
+Học viên đang trong buổi học, đang xem slide trên VLearn và muốn hỏi/tóm tắt nội dung slide nhưng gõ trực tiếp câu hỏi hoặc số trang thay vì bôi đen được đoạn văn bản thật.
+
+**Core JTBD** (không tên sản phẩm/AI):
+> Khi tôi đang học và muốn xác nhận hoặc tóm tắt lại một nội dung trong slide đang xem, tôi muốn nhận được câu trả lời giải thích đúng nội dung đó kèm trích dẫn nguồn rõ ràng ngay cả khi gõ câu hỏi tự do, để tôi tiếp tục học mà không bị mất mạch và không phải tự thao tác tìm lại thủ công.
+
+**Problem statement (KHÔNG chữ AI):**
+> Khi học viên hỏi mà không có đoạn văn bản thật đứng sau câu hỏi (câu hỏi tổng quan, hỏi bằng số trang, hoặc "bôi đen" thực chất chỉ là câu hỏi lặp lại) — chiếm 71.9% tổng số lượt hỏi — hệ thống hỗ trợ không có căn cứ thật để xử lý. Hậu quả: 17% số lượt này bị từ chối thẳng ("không tìm thấy nội dung"), phần còn lại vẫn nhận được câu trả lời nhưng không rõ nguồn gốc (56.2% không trích trang), và tỷ lệ bị đánh giá tệ cao gấp gần 3 lần so với khi có đoạn văn bản thật (60.7% vs 21.4% down).
+
+**Evidence (Đường B — mining, log đầy đủ trong repo/eval):**
+
+*Nguồn:* `data/vlearn-pack/chatlog/chat_history_anonymized_for_hackathon.csv` — 2.522 dòng, 1.261 turn (student+tutor), 369 user, 585 hội thoại, 22–29/07/2026.
+
+*Phương pháp đếm:* tách `content` theo cấu trúc `(Trang N, đoạn được chọn: "...") <câu hỏi>` bằng regex; so sánh phần "đoạn được chọn" với câu hỏi thật để phân biệt bôi đen thật (nội dung slide) vs bôi đen giả (trùng câu hỏi, không có nội dung thật đứng sau); đối chiếu với `citations` (rỗng = không trích nguồn) và `rating`.
+
+| # | Số liệu | Giá trị |
+|---|---|---|
+| 1 | Turn tutor không có citation (toàn bộ) | 582/1261 (46.2%) |
+| 2 | ...trong đó khi tutor dùng nước đi "trả lời thẳng" (`give_direct_answer`) | 111/146 (76%) |
+| 3 | **Turn KHÔNG có anchor thật** (không có đoạn văn bản thật đứng sau câu hỏi — gồm cả "bôi đen" trùng câu hỏi và không bôi đen gì) | **907/1261 (71.9%)** |
+| 4 | **Turn CÓ anchor thật** (đoạn văn bản thật, khác câu hỏi, dài >15 ký tự) | **345/1261 (27.4%)** |
+| 5 | Trong nhóm KHÔNG anchor thật: tutor báo "không tìm thấy" | 154/907 (17.0%) |
+| 6 | Trong nhóm CÓ anchor thật: tutor báo "không tìm thấy" | 2/345 (0.6%) |
+| 7 | Trong nhóm KHÔNG anchor thật: không có citation | 510/907 (56.2%) |
+| 8 | Trong nhóm CÓ anchor thật: không có citation | 63/345 (18.3%) |
+| 9 | Rating down khi KHÔNG anchor thật (n=56 có rating — mẫu nhỏ) | 60.7% |
+| 10 | Rating down khi CÓ anchor thật (n=14 có rating — mẫu rất nhỏ) | 21.4% |
+| 11 | Yêu cầu tóm tắt phạm vi rộng (toàn bộ/cả ngày/cả file) | 22/1261; 16/22 (72.7%) bị từ chối/không làm được |
+
+*Lưu ý: hàng 9-10 dựa trên mẫu rating rất nhỏ (56 và 14 người) — xu hướng rõ (chênh ~3 lần) nhưng không nên khẳng định là số tuyệt đối chắc chắn nếu TA hỏi lại.*
+
+**≥5 quote nguyên văn (tutor, khi không có căn cứ thật):**
+1. "Rất tiếc là tôi đã tra cứu trong tài liệu nhưng chưa tìm thấy nội dung cụ thể của Trang 33..." (M0780)
+2. "Rất xin lỗi, tôi không thể tóm tắt toàn bộ slide chỉ trong một câu trả lời vì tài liệu bài giảng ngày hôm nay bao gồm nhiều nội dung chi tiết..."
+3. "Rất tiếc, hiện tại tài liệu giảng dạy của ngày học này không chứa một trang tóm tắt tổng hợp cụ thể như bạn đề cập..."
+4. "Xin lỗi bạn, tôi không tìm thấy nội dung cụ thể cho slide 37 trong tài liệu hiện có..." (M0949, ví dụ bôi đen giả)
+5. "Chào bạn, rất xin lỗi vì hiện tại hệ thống tìm kiếm không tìm thấy nội dung cụ thể cho trang 4 trong tài liệu của bài học hôm nay..."
+6. "Rất tiếc, mình đã kiểm tra lại các tài liệu của bài học hôm nay nhưng không thấy trang 25 đề cập đến lưu ý nào như bạn mô tả..."
+
+---
+
+## §2. Impact & quyết định chọn
+
+**Bảng impact ≥3 ứng viên:**
+
+| Ứng viên | Bao nhiêu người/turn gặp | Tần suất | Tốn gì mỗi lần | Khả thi build? | Chọn? |
+|---|---|---|---|---|---|
+| **VLearn Page-Context Fallback** (nhận diện trang slide hiện tại làm ngữ cảnh khi thiếu bôi đen, ép trích dẫn nguồn) | 907/1261 turn (71.9%) không có anchor thật; 582/1261 (46.2%) không citation nói chung | Xảy ra hằng ngày trong suốt 7 ngày data | Học viên mất niềm tin (rating down gấp ~3 lần: 60.7% vs 21.4%), phải tự tra lại tài liệu gốc, bị gián đoạn mạch học | Có — lấy page context tự động khi bôi đen rỗng, test bằng golden set từ chatlog thật | **CHỌN** |
+| AI Concept Coach (giải thích khái niệm + quiz hiểu) | ~54% câu hỏi mang ý "giải thích" — nhưng lan toả toàn bộ sản phẩm | Thường xuyên nhưng không tập trung vào 1 concept cụ thể | Không rõ — thiếu bằng chứng "học sai" cụ thể | Khó — rủi ro không kịp evidence chuẩn | Loại |
+| Chặn out-of-scope/prompt injection (③) | 7 turn injection rõ + 17 turn hỏi meta hệ thống | Hiếm (24 turn / 1261, ~1.9%) | Rủi ro bảo mật nếu lộ, nhưng tần suất thấp | Có nhưng phạm vi hẹp | Loại |
+
+**Ứng viên chọn + vì sao (bằng số):** VLearn Page-Context Fallback — vì đây là vấn đề tần suất cao nhất (71.9% turn không có anchor thật), có tương quan đo được với rating xấu (~3 lần), thu hẹp được thành đúng MỘT quyết định: *dùng page context hiện tại để giải đáp thay vì từ chối*.
+
+---
+
+## §3. Giải pháp tương tự đã nghiên cứu
+
+- **NotebookLM:** Luôn tự động gắn ngữ cảnh file/trang đang mở và trích dẫn số trang trực tiếp bên cạnh câu trả lời.
+- **Khanmigo:** Khi học viên không bôi đen, AI gợi ý lại vị trí trang hiện tại để làm điểm bắt đầu thảo luận.
+- **ChatGPT (Study Mode):** Tự đọc lại toàn bộ đoạn văn bản đang active của người dùng thay vì đòi hỏi bôi đen thủ công.
+
+---
+
+## §4. Thiết kế
+
+**Lát cắt MỘT CÂU:**
+> Học viên đang ở trang 14 gõ "tóm tắt slide này" mà không bôi đen văn bản → AI Tutor tự động lấy nội dung trang 14 làm ngữ cảnh → trả lời đúng nội dung trang 14 kèm trích dẫn [trang 14], không từ chối và không bắt học viên mô tả lại.
+
+**Non-goals (≥3 thứ KHÔNG build):**
+1. Không xử lý tóm tắt toàn bộ tài liệu/cả ngày học (để lại backlog).
+2. Không thiết kế lại giao diện bôi đen/UI chọn đoạn (giữ nguyên UI hiện có).
+3. Không xây dựng cơ chế chống prompt injection toàn diện.
+
+**Mức prototype nhắm tới:** [x] Mock — phần mock: data slide giả lập; phần thật: logic fallback lấy page context và sinh trích dẫn [Trang N].
+
+**Automation:** [x] conditional — lý do theo cost-of-error: khi có anchor thật hoặc suy ra được page context → tự động trả lời; khi không chắc chắn → hỏi lại 1 câu thay vì đoán mò, tránh làm học viên ghi nhớ sai kiến thức.
+
+**§4b. Nguyên tắc đã áp dụng (≥4):**
+
+| Nguyên tắc | Áp cụ thể vào đâu trong prototype |
+|---|---|
+| G10 — Thu hẹp phạm vi khi nghi ngờ | Khi không phát hiện anchor thật -> dùng ngay trang hiện tại làm ngữ cảnh thu hẹp |
+| G2 — Làm rõ nó làm tốt đến đâu | Câu trả lời luôn kèm nhãn rõ 📌 Trích dẫn [Trang N] |
+| G11 — Giải thích vì sao | Khi từ chối/hỏi lại, giải thích rõ: "Do chưa rõ ý ở Trang 14, bạn có muốn tóm tắt phần X không?" |
+| G9 — Sửa dễ dàng | Cho phép gõ lại hoặc chuyển sang trang khác để cập nhật ngữ cảnh tức thì |
+
+---
+
+## §5. Kiểu lỗi — 4 lớp chỗ khó + kịch bản (≥8)
+
+| # | Tình huống cụ thể | Lớp | Hành vi mong muốn | Nguyên tắc áp |
+|---|---|---|---|---|
+| 1 | Học viên bôi đen đúng đoạn thật | Happy path | Trả lời + trích trang | G2 |
+| 2 | Học viên gõ "tóm tắt slide này" không bôi đen | ① Nguồn sự thật | Lấy nội dung trang hiện tại trả lời + trích trang | G10, G2 |
+| 3 | Học viên yêu cầu tóm tắt cả khóa học | ① Nguồn sự thật | Nói rõ giới hạn (chỉ tóm tắt trang hiện tại), gợi ý hỏi từng phần | G2, G11 |
+| 4 | Từ khóa bôi đen quá ngắn (VD "AI") | ② Mơ hồ/thiếu thông tin | Hỏi lại 1 câu để xác nhận ý định dựa trên trang hiện tại | G10 |
+| 5 | Câu hỏi trùng với nhiều khái niệm trên trang | ② Mơ hồ/thiếu thông tin | Trả lời ý chính + hỏi thêm phần còn lại | G10 |
+| 6 | Hỏi về thông tin hệ thống/API | ③ Ngoài phạm vi | Từ chối, quay lại nội dung bài học | G10 |
+| 7 | Thử prompt injection | ③ Ngoài phạm vi | Từ chối thực hiện yêu cầu | G10, G11 |
+| 8 | Trang chứa code/công thức phức tạp | ④ Đặc thù domain | Trích dẫn chính xác + báo mức tin cậy nếu không chắc | G2, G11 |
+
+---
+
+## §6. Bốn đường đi của trải nghiệm
+
+- **Happy path:** Gõ câu hỏi tự do ở trang N → AI dùng ngữ cảnh trang N trả lời kèm `[Trang N]`.
+- **Low-confidence (②):** Câu hỏi quá ngắn/mơ hồ → AI đặt 1 câu hỏi làm rõ dựa trên trang hiện tại.
+- **Failure/không căn cứ (①):** Đòi hỏi vượt quá tài liệu -> AI báo rõ giới hạn phạm vi trang.
+- **Correction (user sửa):** Chuyển trang slide -> AI tự cập nhật ngữ cảnh trang mới ngay lập tức.
+
+---
+
+## §7. Kiểm thử
+
+**Golden set:** 20 case lưu tại `eval/golden-set.json`.
+**Quality bar:** "Đạt khi ≥ 80% qua bộ, và 100% câu hỏi ở trang N phải có citation [Trang N]".
+
+---
+
+## §8. Phân công & kế hoạch
+
+**Willing users:** Nguyễn Văn A, Trần Thị B, Lê Văn C (Thành viên lớp AI Thực Chiến).
+
+**Phân công:**
+- Evidence & Mining: [Tên A]
+- Build Prototype: [Tên B]
+- Prompt & Golden Set: [Tên C]
+- Spec & Validation: [Tên D]
