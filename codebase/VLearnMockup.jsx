@@ -620,7 +620,7 @@ function RealPDFViewer({ file, page, zoom, onTotalPages, onTextExtracted, hasHig
     let cancelled = false;
     setLoading(true);
     setError(null);
-    pdfjsLib.getDocument(file.pdfUrl).promise.then((pdf) => {
+    pdfjsLib.getDocument({ url: file.pdfUrl }).promise.then((pdf) => {
       if (cancelled) return;
       pdfDocRef.current = pdf;
       onTotalPages(pdf.numPages);
