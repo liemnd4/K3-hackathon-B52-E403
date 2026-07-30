@@ -11,13 +11,13 @@ Loại: [x] Tối ưu tính năng có sẵn
 **Job executor:**
 Học viên đang-trong-buổi-học, xem slide trên VLearn và cần tra cứu lại nội dung đang xem.
 
-**Hành vi/pain quan sát được:** 
+**Hành vi/pain quan sát được** *(tách riêng khỏi job executor theo đúng worksheet JTBD — đây là hành vi dẫn đến pain, không phải định nghĩa vai):*
 Học viên gõ trực tiếp câu hỏi hoặc số trang thay vì bôi đen được đoạn văn bản thật.
 
-**Core JTBD:**
+**Core JTBD** *(đã bỏ phần mô tả cách giải pháp hoạt động — "trích dẫn", "gõ câu hỏi tự do" — theo đúng tiêu chí tự kiểm ③ của worksheet: không nhét solution vào câu JTBD):*
 > Khi tôi đang học và muốn xác nhận hoặc tóm tắt lại một nội dung trong slide đang xem, tôi muốn biết chắc câu trả lời có dựa trên đúng nội dung tài liệu hay không, để tôi tiếp tục học mà không mất mạch và không phải tự thao tác tìm lại thủ công.
 
-**Ba job stories:**
+**Ba job stories** *(theo format When / I want to / So I can — lấy từ chatlog thật):*
 
 | # | When | I want to | So I can |
 |---|---|---|---|
@@ -25,7 +25,7 @@ Học viên gõ trực tiếp câu hỏi hoặc số trang thay vì bôi đen đ
 | JS2 | Hỏi bằng số trang ("slide 37 nói về điều gì") thay vì bôi đen | Được trả lời dựa trên đúng trang đang xem, không bị từ chối | Tiếp tục mạch học không bị ngắt |
 | JS3 | Nhận câu trả lời từ tutor | Biết chắc thông tin đó có nguồn trích dẫn hay không | Tin tưởng và không phải tự kiểm tra lại tài liệu gốc |
 
-**Current alternatives:** *
+**Current alternatives** *(user đang tự làm gì để giải quyết job này — khác với §3 "giải pháp tương tự trên thị trường"):*
 
 | Alternative | Làm tốt gì? | Fail ở đâu? | Vì sao chưa bỏ |
 |---|---|---|---|
@@ -136,8 +136,9 @@ Học viên gõ trực tiếp câu hỏi hoặc số trang thay vì bôi đen đ
 | 7 | Thử prompt injection | ③ Ngoài phạm vi | Từ chối thực hiện yêu cầu | G10, G11 |
 | 8 | Trang chứa code/công thức phức tạp | ④ Đặc thù domain | Trích dẫn chính xác + báo mức tin cậy nếu không chắc | G2, G11 |
 | 9 | Không có anchor thật, tutor có xu hướng tự đoán lý do kỹ thuật không kiểm chứng được (VD "có thể trang này chứa hình ảnh mà hệ thống không trích xuất được") | ① Nguồn sự thật | Không suy đoán nguyên nhân kỹ thuật chưa kiểm chứng — chỉ nói "chưa tìm được nội dung, bạn mô tả lại giúp mình được không?" | G10, G11 |
+| 10 | Học viên hỏi về một công thức/con số cụ thể trên slide (VD: tỷ lệ %, công thức tính) — nếu fallback trích sai hoặc làm tròn sai con số, học viên có thể ghi nhớ nhầm ngay mà không biết để nghi ngờ vì vẫn thấy có citation | ④ Đặc thù domain | Ưu tiên copy nguyên văn số liệu/công thức thay vì diễn giải lại; nếu không chắc chắn khớp 100% bản gốc, nói rõ "bạn nên đối chiếu lại với slide gốc" | G2, G11 |
 
-*(9 kịch bản, phủ đủ 4 lớp — lớp ① có 3 case, ② có 2, ③ có 2, ④ có 1; nên bổ sung thêm 1 case ④ nữa cho đủ ≥2/lớp trước khi nộp CP4.)*
+*(10 kịch bản, phủ đủ 4 lớp — lớp ① có 3 case, ② có 2, ③ có 2, ④ có 2. Đạt chuẩn ≥2 case/lớp theo guide §2.5.)*
 
 ---
 
