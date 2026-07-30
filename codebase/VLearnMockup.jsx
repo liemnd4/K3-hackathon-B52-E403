@@ -700,11 +700,11 @@ function RealPDFViewer({ file, page, zoom, onTotalPages, onTextExtracted, hasHig
           </div>
         )}
         {!loading && !error && (
-          <div className="relative inline-block">
-            <canvas ref={canvasRef} className="block" />
+          <div className="relative flex items-center justify-center max-w-full max-h-full">
+            <canvas ref={canvasRef} className="block max-w-full max-h-[75vh] w-auto h-auto object-contain rounded-lg shadow-sm" />
             <div
               ref={textLayerRef}
-              className="pdf-text-layer absolute top-0 left-0 right-0 bottom-0 pointer-events-auto opacity-40 select-text font-sans"
+              className="pdf-text-layer absolute top-0 left-0 right-0 bottom-0 pointer-events-auto opacity-40 select-text font-sans overflow-hidden"
               style={{ mixBlendMode: "multiply" }}
             />
             {/* Simulation button nếu người dùng muốn bôi đen nhanh */}
