@@ -1,4 +1,4 @@
-# AI SPEC — VLearn Tutor Page-Context Fallback (Hỗ trợ ngữ cảnh slide khi không có bôi đen) · Nhóm [XX] · Zone [X]
+# AI SPEC — VLearn Tutor Page-Context Fallback (Hỗ trợ ngữ cảnh slide khi không có bôi đen) · Nhóm B52
 
 Hướng: [x] A — VLearn  [ ] B — Trợ lý Học viên  [ ] C — Làn mở
 Loại: [x] Tối ưu tính năng có sẵn  [ ] Tính năng mới
