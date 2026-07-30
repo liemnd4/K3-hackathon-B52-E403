@@ -6,6 +6,13 @@ import {
   Paperclip, ThumbsUp, ThumbsDown, Copy, RefreshCw, Trash2, FileText,
   Circle, History, KeyRound, ShieldCheck,
 } from "lucide-react";
+import * as pdfjsLib from "pdfjs-dist";
+
+// Worker của pdfjs — trỏ vào file worker trong node_modules
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url
+).toString();
 
 // ---------------------------------------------------------------------------
 // Mock data — course structure
@@ -39,12 +46,14 @@ const DAY_META = {
 };
 
 const COURSE_DATA = [
-  { id: "d1", label: "Day 1", count: 2, status: "ACTIVE", files: [
-      { id: "d1f1", name: "day01-gioi-thieu-ai-product.pdf", pages: 22, day: "d1" },
-      { id: "d1f2", name: "day01-cong-cu-va-moi-truong.pdf", pages: 14, day: "d1" },
+  { id: "d1", label: "Day 1", count: 1, status: "ACTIVE", files: [
+      // pdfUrl trỏ tới file PDF thật trong data/ — Vite serve qua fs.allow: ['..']
+      { id: "d1f1", name: "d1-slide-hackathon.pdf", pages: 0, day: "d1",
+        pdfUrl: "../data/vlearn-pack/slides/d1-slide-hackathon.pdf" },
   ]},
   { id: "d2", label: "Day 2", count: 1, status: "ACTIVE", files: [
-      { id: "d2f1", name: "day02-prompt-engineering-co-ban.pdf", pages: 31, day: "d2" },
+      { id: "d2f1", name: "d2-slide-hackathon.pdf", pages: 0, day: "d2",
+        pdfUrl: "../data/vlearn-pack/slides/d2-slide-hackathon.pdf" },
   ]},
   { id: "d3", label: "Day 3", count: 2, status: "ACTIVE", files: [
       { id: "d3f1", name: "day03-tu-chatbot-den-agentic-agent.pdf", pages: 46, day: "d3" },
@@ -595,7 +604,127 @@ function SlideContent({ slide, page }) {
   );
 }
 
-function PDFViewer({ dayId, file, page, zoom, activeTool, hasHighlight, highlightedText, onSelectHighlight, onClearHighlight }) {
+
+// ---------------------------------------------------------------------------
+// RealPDFViewer — render PDF thật bằng pdfjs-dist canvas
+// ---------------------------------------------------------------------------
+
+function RealPDFViewer({ file, page, zoom, onTotalPages, onTextExtracted, hasHighlight, highlightedText, onSelectHighlight, onClearHighlight }) {
+  const canvasRef = useRef(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const pdfDocRef = useRef(null);
+
+  // Load PDF document
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    pdfjsLib.getDocument(file.pdfUrl).promise.then((pdf) => {
+      if (cancelled) return;
+      pdfDocRef.current = pdf;
+      onTotalPages(pdf.numPages);
+      setLoading(false);
+    }).catch((err) => {
+      if (!cancelled) { setError(err.message); setLoading(false); }
+    });
+    return () => { cancelled = true; };
+  }, [file.pdfUrl]);
+
+  // Render trang hiện tại vào canvas + extract text
+  useEffect(() => {
+    if (!pdfDocRef.current || loading) return;
+    let cancelled = false;
+    pdfDocRef.current.getPage(page).then((pdfPage) => {
+      if (cancelled) return;
+      // Render canvas
+      const viewport = pdfPage.getViewport({ scale: 1.8 });
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      const ctx = canvas.getContext("2d");
+      pdfPage.render({ canvasContext: ctx, viewport }).promise.then(() => {
+        if (cancelled) return;
+        // Extract text sau khi render xong
+        pdfPage.getTextContent().then((tc) => {
+          if (cancelled) return;
+          const text = tc.items.map((item) => item.str).join(" ").trim();
+          onTextExtracted(page, text || "(Trang này không có text — có thể là slide hình ảnh)");
+        });
+      });
+    });
+    return () => { cancelled = true; };
+  }, [page, loading]);
+
+  return (
+    <div className="flex-1 min-h-0 flex items-center justify-center px-4 sm:px-6 py-6 overflow-auto">
+      <div
+        className="relative bg-white rounded-[20px] border border-blue-100 shadow-lg shadow-slate-200/60 overflow-hidden transition-transform duration-200 origin-top"
+        style={{ transform: `scale(${zoom / 100})`, transformOrigin: "top center" }}
+      >
+        {loading && (
+          <div className="w-[900px] h-[600px] flex flex-col items-center justify-center gap-3 text-slate-400">
+            <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm">Đang tải PDF...</span>
+          </div>
+        )}
+        {error && (
+          <div className="w-[900px] h-[600px] flex flex-col items-center justify-center gap-2 text-red-400 px-8 text-center">
+            <span className="text-2xl">⚠️</span>
+            <p className="text-sm font-medium">Không tải được PDF</p>
+            <p className="text-xs text-slate-400">{error}</p>
+          </div>
+        )}
+        {!loading && !error && (
+          <>
+            <canvas ref={canvasRef} className="block max-w-full" />
+            {/* Overlay bôi đen */}
+            {!hasHighlight && (
+              <div className="absolute bottom-4 left-4 right-4 z-20">
+                <p className="text-[10px] text-slate-400 text-center bg-white/80 rounded-lg px-2 py-1">
+                  Bôi đen văn bản trong PDF rồi hỏi — hoặc gõ câu hỏi trực tiếp vào chat
+                </p>
+              </div>
+            )}
+            {hasHighlight && (
+              <div className="absolute left-4 right-4 bottom-4 z-20 px-3 py-2 rounded-lg bg-amber-200/90 border border-amber-400 text-[11px] leading-snug text-amber-900 font-medium shadow-sm">
+                <div className="flex items-start justify-between gap-2">
+                  <span>📌 Đoạn đã chọn: "{highlightedText}"</span>
+                  <button onClick={onClearHighlight} className="flex-shrink-0 w-4 h-4 rounded-full bg-amber-500/40 hover:bg-amber-500/70 flex items-center justify-center text-[10px]">✕</button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// PDFViewer — tự switch giữa RealPDFViewer (PDF thật) và Mock slide
+// ---------------------------------------------------------------------------
+
+function PDFViewer({ dayId, file, page, zoom, activeTool, hasHighlight, highlightedText, onSelectHighlight, onClearHighlight, onTotalPages, onTextExtracted }) {
+  // Nếu file có pdfUrl → dùng RealPDFViewer
+  if (file.pdfUrl) {
+    return (
+      <RealPDFViewer
+        file={file}
+        page={page}
+        zoom={zoom}
+        onTotalPages={onTotalPages}
+        onTextExtracted={onTextExtracted}
+        hasHighlight={hasHighlight}
+        highlightedText={highlightedText}
+        onSelectHighlight={onSelectHighlight}
+        onClearHighlight={onClearHighlight}
+      />
+    );
+  }
+
+  // Fallback: mock slide generator (Day 3-6)
   const slide = useMemo(() => buildSlide(dayId, file.id, page, file.pages, file.name), [dayId, file.id, page, file.pages, file.name]);
   const sample = useMemo(() => getSampleHighlight(dayId, file, page), [dayId, file, page]);
   return (
@@ -613,7 +742,6 @@ function PDFViewer({ dayId, file, page, zoom, activeTool, hasHighlight, highligh
           {slide.type === "content" && <SlideContent slide={slide} page={page} />}
         </div>
 
-        {/* Mô phỏng bôi đen — đúng lát cắt chính: có anchor thật hay không */}
         {!hasHighlight && activeTool === "highlight" && (
           <button
             onClick={() => onSelectHighlight(sample)}
@@ -627,19 +755,14 @@ function PDFViewer({ dayId, file, page, zoom, activeTool, hasHighlight, highligh
           <div className="absolute left-6 right-6 bottom-6 z-20 px-3 py-2 rounded-lg bg-amber-200/50 border border-amber-400 text-[11px] leading-snug text-amber-900 font-medium shadow-sm">
             <div className="flex items-start justify-between gap-2">
               <span>{highlightedText}</span>
-              <button
-                onClick={onClearHighlight}
-                className="flex-shrink-0 w-4 h-4 rounded-full bg-amber-500/40 hover:bg-amber-500/70 flex items-center justify-center text-[10px] leading-none"
-                title="Bỏ chọn"
-              >
-                ✕
-              </button>
+              <button onClick={onClearHighlight} className="flex-shrink-0 w-4 h-4 rounded-full bg-amber-500/40 hover:bg-amber-500/70 flex items-center justify-center text-[10px] leading-none">✕</button>
             </div>
           </div>
         )}
       </div>
     </div>
   );
+
 }
 
 function PageNavigation({ page, totalPages, onChange }) {
@@ -794,7 +917,7 @@ function QuotaBar({ used, total, byok, onToggleByok }) {
   );
 }
 
-function AIChatPanel({ open, minimized, currentPage, dayId, file, fileName, onClose, onMinimizeToggle, hasHighlight, highlightedText }) {
+function AIChatPanel({ open, minimized, currentPage, dayId, file, fileName, onClose, onMinimizeToggle, hasHighlight, highlightedText, pdfPageTexts = {} }) {
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
@@ -834,7 +957,11 @@ function AIChatPanel({ open, minimized, currentPage, dayId, file, fileName, onCl
     if (!byok) setQuotaUsed((q) => Math.min(quotaTotal, q + 1));
 
     const seed = hashPage(dayId, currentPage) + trimmed.length;
-    const pageContextText = getPageContextText(dayId, file, currentPage);
+    const pageContextText =
+      // Ưu tiên dùng text extract từ PDF thật nếu đã có
+      pdfPageTexts[currentPage]
+        ? `Nội dung văn bản từ PDF (Trang ${currentPage}):\n${pdfPageTexts[currentPage]}`
+        : getPageContextText(dayId, file, currentPage);
     const dayContextText = getDayContextText(dayId);
     const dayMeta = DAY_META[dayId];
     const dayLabel = dayMeta ? `Ngày ${dayId.replace("d", "")} — ${dayMeta.title}` : `Ngày ?`;
@@ -1086,6 +1213,16 @@ export default function App() {
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [assistantMinimized, setAssistantMinimized] = useState(false);
 
+  // State lưu text đã extract từ PDF thật: { [pageNum]: "text..." }
+  const [pdfPageTexts, setPdfPageTexts] = useState({});
+  const [pdfTotalPages, setPdfTotalPages] = useState(0);
+
+  // Reset khi đổi file
+  useEffect(() => {
+    setPdfPageTexts({});
+    setPdfTotalPages(0);
+  }, [selectedFile]);
+
   const [toast, setToast] = useState({ show: false, message: "" });
   const showToast = (message) => {
     setToast({ show: true, message });
@@ -1181,8 +1318,14 @@ export default function App() {
               setHasHighlight(false);
               setHighlightedText("");
             }}
+            onTotalPages={(n) => setPdfTotalPages(n)}
+            onTextExtracted={(pageNum, text) => setPdfPageTexts((prev) => ({ ...prev, [pageNum]: text }))}
           />
-          <PageNavigation page={page} totalPages={selectedFile.pages} onChange={setPage} />
+          <PageNavigation
+            page={page}
+            totalPages={selectedFile.pdfUrl ? pdfTotalPages || 1 : selectedFile.pages}
+            onChange={setPage}
+          />
         </main>
       </div>
 
@@ -1198,6 +1341,7 @@ export default function App() {
           onMinimizeToggle={() => setAssistantMinimized((m) => !m)}
           hasHighlight={hasHighlight}
           highlightedText={highlightedText}
+          pdfPageTexts={pdfPageTexts}
         />
       )}
     </div>
