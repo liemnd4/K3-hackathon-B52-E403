@@ -128,10 +128,22 @@ Học viên đang trong buổi học, đang xem slide trên VLearn và muốn h�
 
 ## §8. Phân công & kế hoạch
 
-**Willing users:** Nguyễn Văn A, Trần Thị B, Lê Văn C (Thành viên lớp AI Thực Chiến).
+**Willing users (≥3 tên):**
+1. Nguyễn Văn A (Học viên AI Thực Chiến)
+2. Trần Thị B (Học viên AI Thực Chiến)
+3. Lê Văn C (Học viên AI Thực Chiến)
 
-**Phân công:**
-- Evidence & Mining: [Tên A]
-- Build Prototype: [Tên B]
-- Prompt & Golden Set: [Tên C]
-- Spec & Validation: [Tên D]
+**Phân công có tên cụ thể:**
+- **Evidence & Mining (Phần bằng chứng §1-§2):** Nguyễn Đình Liêm - 01421, Nguyễn Hồng Yến - 01065
+- **Build Prototype (Codebase & UI):** Đỗ Trung Kiên - 01287, Nguyễn Văn Hưng - 01251
+- **Prompt & Golden Set (Phần Prompt & Đánh giá §7):** Nguyễn Đình Liêm - 01421, Nguyễn Hồng Yến - 01065
+- **Spec & Validation (Viết Spec & Log user test §4, §8, §9):** Đỗ Trung Kiên - 01287, Nguyễn Văn Hưng - 01251
+- **Demo & Presentation (Slide & Demo live):** Cả nhóm tham gia trình bày (mỗi thành viên ≥1 phần)
+
+**Kế hoạch vòng validation CP5 (3 câu hỏi, ai log):**
+- Thực hiện phỏng vấn/test thử trên 3 Willing Users.
+- Người thực hiện log feedback: Đỗ Trung Kiên & Nguyễn Văn Hưng.
+- 3 câu hỏi phỏng vấn:
+  1. *"Điều gì khó hiểu hoặc khó chịu nhất khi dùng thử?"*
+  2. *"Kết quả trích dẫn [Trang N] này bạn có tin không — vì sao?"*
+  3. *"Bạn có dùng thật công cụ này trong giờ học không — vì sao/vì sao chưa?"*
