@@ -1,5 +1,37 @@
-﻿.DS_Store
-node_modules/
+# Environment & Sensitive Credentials
+.env
 *.env
+codebase/.env
+
+# Dependencies & Build Outputs
+node_modules/
+codebase/node_modules/
+dist/
+codebase/dist/
+build/
 vlearn-preview/
 my-app/
+
+# Vite build cache (auto-generated, không cần commit)
+codebase/.vite/
+
+# File PDF nặng (chạy pipeline để tự tạo lại)
+*.pdf
+codebase/public/day01-slide-blue-v0.pdf
+
+# Generated Media & Rendered Assets (Slides & Crops)
+codebase/public/slides/
+codebase/public/crops/
+
+# Python & AI Model Weights
+__pycache__/
+*.pyc
+*.pt
+doclayout_yolo.pt
+yolo11n.pt
+.venv/
+venv/
+
+# OS & System Logs
+.DS_Store
+*.log

@@ -1,0 +1,65 @@
+{
+  "page_1": {
+    "page_number": 1,
+    "title": "AI IN ACTION - Day 1 AI & LLM Foundation Instructor: Mai Anh",
+    "text_content": "AI IN ACTION - Day 1 AI & LLM Foundation Instructor: Mai Anh Nguyen (Blue)",
+    "has_diagram": false,
+    "crops": []
+  },
+  "page_2": {
+    "page_number": 2,
+    "title": "Instructor Mai Anh Nguyen (Blue) Generalist Product Builder ",
+    "text_content": "Instructor Mai Anh Nguyen (Blue) Generalist Product Builder  2026                FPT Long Châu (PM · Healthcare Product) 2025                Thongtincuuho.org (Co-founder) 2025                FPT Software AI Center (PM · AI Agent) 2021 - 2025    Xantus (PM · On-chain Analytics, AI Agent) 2016 - 2021    DYNO, Kalapa (PM · OCR, eKYC, Credit Scoring) Linkedin | Facebook",
+    "has_diagram": false,
+    "crops": []
+  },
+  "page_3": {
+    "page_number": 3,
+    "title": "LËch sí  AI",
+    "text_content": "LËch sí  AI",
+    "has_diagram": false,
+    "crops": []
+  },
+  "page_4": {
+    "page_number": 4,
+    "title": "LËch sí AI 70 n\u0003 m Khai sinh, l Ýi héa \u0011§u ti u tiên 2 l§n m",
+    "text_content": "LËch sí AI 70 n\u0003 m Khai sinh, l Ýi héa \u0011§u ti u tiên 2 l§n mùa \u0011ông, cách ti¿p c\u0000n ch¡m tr§n Të model \u0011¡n l» sang system có kh£  n\u0003ng hành \u0011Ùng nh°  agent",
+    "has_diagram": true,
+    "crops": [
+      {
+        "crop_id": "p4_diagram",
+        "title": "Biểu đồ đường cong Lịch sử AI 70 năm (Khai sinh, 2 Mùa đông AI, Deep Learning, ChatGPT, Agent 2024)",
+        "type": "Lesson_Diagram",
+        "bbox": [
+          200,
+          270,
+          3800,
+          2025
+        ],
+        "crop_path": "/crops/page_4_diagram.png",
+        "description": "Biểu đồ \"Lịch sử AI 70 năm\" mô tả sự phát triển của trí tuệ nhân tạo từ năm 1956 đến 2026, với các mốc quan trọng như Hội thảo Dartmouth, sự ra đời của Perceptrons, và hai mùa đông AI. Các giai đoạn này phản ánh những thách thức và cơ hội trong nghiên cứu AI, từ những kỳ vọng ban đầu đến những giai đoạn khó khăn. Đặc biệt, sự phát triển của Deep Learning và các mô hình như GPT-1, BERT, và ChatGPT cho thấy sự tiến bộ vượt bậc trong khả năng xử lý ngôn ngữ tự nhiên và học máy. Biểu đồ này không chỉ tóm tắt lịch sử mà còn nhấn mạnh xu hướng chuyển đổi từ các mô hình đơn giản sang các hệ thống phức tạp có khả năng hoạt động như agent."
+      }
+    ]
+  },
+  "page_5": {
+    "page_number": 5,
+    "title": "1956: Dartmouth Workshop \"Artificial Intelligence\" ra \u0011Ýi vÛ",
+    "text_content": "1956: Dartmouth Workshop \"Artificial Intelligence\" ra \u0011Ýi vÛi ý t°ßng: n¿u trí thông minh có thÃ  \u0011°ãc mô t£ \u0011ç rõ, thì má y móc cing có thÃ mô phÏng l¡i nó. i nó.",
+    "has_diagram": true,
+    "crops": [
+      {
+        "crop_id": "p5_diagram",
+        "title": "Sơ đồ 1956 Dartmouth Workshop & Lịch sử AI",
+        "type": "Lesson_Diagram",
+        "bbox": [
+          200,
+          225,
+          3800,
+          2025
+        ],
+        "crop_path": "/crops/page_5_diagram.png",
+        "description": "Biểu đồ về \"Sơ đồ 1956 Dartmouth Workshop & Lịch sử AI\" minh họa quá trình phát triển của trí tuệ nhân tạo từ những năm 1956 đến nay. Thành phần chính của biểu đồ bao gồm các mốc thời gian quan trọng như Hội thảo Dartmouth (1956), sự ra đời của Perceptron (1969), và các bước đột phá như Deep Learning (2006) và AlphaGo (2016). Những mốc này không chỉ đánh dấu sự phát triển công nghệ mà còn phản ánh những thách thức và cơ hội trong lĩnh vực AI. Ý nghĩa chính của biểu đồ là cung cấp cái nhìn tổng quan về lịch sử và tiến trình phát triển của AI, giúp người học hiểu rõ hơn về bối cảnh và các yếu tố ảnh hưởng đến sự tiến bộ của công nghệ này."
+      }
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "category": "Happy Path - Auto Context",
+    "question": "Tóm tắt nội dung chính trang này",
+    "current_page": 2,
+    "slide_file": "day01-slide-blue-v0.pdf",
+    "expected_keywords": ["70%", "thất bại", "vận hành", "con người"],
+    "expected_citation": "[Trang 2]"
+  },
+  {
+    "id": 2,
+    "category": "Happy Path - Diagram Query",
+    "question": "Biểu đồ ở trang này thể hiện điều gì?",
+    "current_page": 5,
+    "slide_file": "day01-slide-blue-v0.pdf",
+    "expected_keywords": ["Ma trận", "High Impact", "Low Effort", "Quick Wins"],
+    "expected_citation": "[Trang 5]"
+  },
+  {
+    "id": 3,
+    "category": "Happy Path - Framework",
+    "question": "Mô hình Kim Cương Đôi có mấy pha?",
+    "current_page": 4,
+    "slide_file": "day01-slide-blue-v0.pdf",
+    "expected_keywords": ["Double Diamond", "Problem Discovery", "Solution Discovery"],
+    "expected_citation": "[Trang 4]"
+  },
+  {
+    "id": 4,
+    "category": "Edge Case - Low Confidence",
+    "question": "Giá cổ phiếu của OpenAI năm nay là bao nhiêu?",
+    "current_page": 1,
+    "slide_file": "day01-slide-blue-v0.pdf",
+    "expected_keywords": ["không tự bịa đặt", "ngoài phạm vi"],
+    "expected_citation": "[Trang 1]"
+  },
+  {
+    "id": 5,
+    "category": "Edge Case - Ambiguous Question",
+    "question": "Cái này dùng làm gì?",
+    "current_page": 6,
+    "slide_file": "day01-slide-blue-v0.pdf",
+    "expected_keywords": ["Automation", "Augmentation"],
+    "expected_citation": "[Trang 6]"
+  }
+]
