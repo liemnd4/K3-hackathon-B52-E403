@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VLearn AI Tutor - Interactive Prototype (CP2)</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --accent-hover: #0284c7;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --border-color: #334155;
+            --user-msg: #0369a1;
+            --tutor-msg: #334155;
+            --badge-bg: #0369a1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: var(--panel-bg);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-cp2 {
+            background-color: #166534;
+            color: #4ade80;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .app-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 60px);
+        }
+
+        /* Slide Viewer Panel */
+        .slide-panel {
+            flex: 6;
+            background-color: #020617;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .slide-frame {
+            background-color: #1e293b;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 16/9;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .slide-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .slide-content {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+
+        .slide-content ul {
+            margin-left: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.5rem;
+        }
+
+        .slide-controls {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-slide {
+            background-color: var(--panel-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-slide:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        /* AI Tutor Chat Panel */
+        .chat-panel {
+            flex: 4;
+            background-color: var(--panel-bg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .context-indicator {
+            font-size: 0.85rem;
+            background: #0f172a;
+            padding: 4px 10px;
+            border-radius: 12px;
+            color: var(--accent-color);
+            border: 1px solid #0284c7;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+
+        .message.user {
+            background-color: var(--user-msg);
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.tutor {
+            background-color: var(--tutor-msg);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .citation-tag {
+            display: inline-block;
+            background-color: #0369a1;
+            color: #e0f2fe;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            cursor: pointer;
+        }
+
+        .chat-input-area {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            background-color: #0f172a;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-color);
+        }
+
+        .btn-send {
+            background-color: var(--accent-color);
+            color: #020617;
+            font-weight: bold;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-send:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .quick-prompts {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            font-size: 0.8rem;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+            padding: 4px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .chip:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            ⚡ VLearn Adaptive Platform <span style="font-weight: normal; color: var(--text-sub);">| AI Tutor</span>
+        </div>
+        <div class="badge-cp2">Checkpoint 2 Working Flow</div>
+    </header>
+
+    <div class="app-container">
+        <!-- Slide View -->
+        <div class="slide-panel">
+            <div class="slide-frame" id="slideFrame">
+                <div class="slide-header">Day 3: ReAct Pattern & Agentic Workflows</div>
+                <div class="slide-content">
+                    <p><strong>Trang 14: Agent Patterns Nên Tăng Dần Theo Nhu Cầu</strong></p>
+                    <ul>
+                        <li><strong>Augmented LLM:</strong> Prompt + docs + tools cơ bản.</li>
+                        <li><strong>Prompt Chaining:</strong> Các bước nối tiếp nhau rõ ràng.</li>
+                        <li><strong>Routing:</strong> Phân luồng câu hỏi cho các Agent chuyên biệt.</li>
+                        <li><strong>Orchestrator-Worker:</strong> Phân chia nhiệm vụ phức tạp cho worker.</li>
+                        <li><strong>ReAct Agent:</strong> Vòng lặp Thought -> Action -> Observation tự quyết định.</li>
+                    </ul>
+                </div>
+                <div class="slide-footer">
+                    <span>Khóa học AI Thực Chiến (VinUni)</span>
+                    <span id="pageDisplay">Trang 14 / 46</span>
+                </div>
+            </div>
+
+            <div class="slide-controls">
+                <button class="btn-slide" onclick="changePage(-1)">◄ Trang trước</button>
+                <span style="font-size: 0.9rem; color: var(--text-sub);">Đang ở trang 14</span>
+                <button class="btn-slide" onclick="changePage(1)">Trang sau ►</button>
+            </div>
+        </div>
+
+        <!-- AI Tutor Chat View -->
+        <div class="chat-panel">
+            <div class="chat-header">
+                <div style="font-weight: 600;">🤖 AI Tutor (Trợ giảng VLearn)</div>
+                <div class="context-indicator" id="contextIndicator">📍 Context: Trang 14 (Day 03)</div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message tutor">
+                    Xin chào! Mình là AI Tutor. Bạn đang mở <strong>Trang 14: Agent Patterns</strong>. Mình luôn tự động đồng bộ theo trang slide bạn xem mà không bắt bạn bôi đen thủ công!
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <div class="quick-prompts">
+                    <span class="chip" onclick="setPrompt('tóm tắt slide này')">💡 tóm tắt slide này</span>
+                    <span class="chip" onclick="setPrompt('ReAct agent là gì?')">💡 ReAct agent là gì?</span>
+                    <span class="chip" onclick="setPrompt('slide 14 nói về điều gì')">💡 slide 14 nói về điều gì</span>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" id="userInput" placeholder="Gõ câu hỏi (không cần bôi đen)..." onkeypress="handleKeyPress(event)">
+                    <button class="btn-send" onclick="sendMessage()">Gửi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 14;
+
+        function setPrompt(text) {
+            document.getElementById('userInput').value = text;
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function changePage(delta) {
+            currentPage += delta;
+            if (currentPage < 1) currentPage = 1;
+            document.getElementById('pageDisplay').innerText = `Trang ${currentPage} / 46`;
+            document.getElementById('contextIndicator').innerText = `📍 Context: Trang ${currentPage} (Day 03)`;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chatMessages = document.getElementById('chatMessages');
+
+            // 1. Render User Message
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.className = 'message user';
+            userMsgDiv.innerText = text;
+            chatMessages.appendChild(userMsgDiv);
+
+            input.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // 2. Simulate AI Processing & Response (Flow trung tâm của CP2)
+            setTimeout(() => {
+                const tutorMsgDiv = document.createElement('div');
+                tutorMsgDiv.className = 'message tutor';
+
+                // Lát cắt MỘT CÂU xử lý: Khi học viên gõ "tóm tắt slide này" mà không bôi đen -> dùng page context
+                if (text.toLowerCase().includes('tóm tắt') || text.toLowerCase().includes('trang 14') || text.toLowerCase().includes('slide 14') || text.toLowerCase().includes('này')) {
+                    tutorMsgDiv.innerHTML = `
+                        <strong>Tóm tắt nội dung Trang 14 (Agent Patterns):</strong><br>
+                        Trang này trình bày 5 mô hình thiết kế Agent tăng dần theo độ phức tạp:<br>
+                        1. <strong>Augmented LLM</strong>: Mức cơ bản nhất ghép prompt + docs.<br>
+                        2. <strong>Prompt Chaining</strong>: Nối các bước xử lý tuần tự.<br>
+                        3. <strong>Routing</strong>: Điều hướng câu hỏi theo từng chuyên gia.<br>
+                        4. <strong>Orchestrator-Worker</strong>: Phân việc cho các worker xử lý.<br>
+                        5. <strong>ReAct Agent</strong>: Mô hình tự quyết định vòng lặp suy nghĩ và hành động.<br>
+                        <br>
+                        <span class="citation-tag">📌 Trích dẫn [Trang 14]</span>
+                    `;
+                } else {
+                    tutorMsgDiv.innerHTML = `
+                        Tutor đã nhận câu hỏi của bạn dựa trên ngữ cảnh <strong>Trang ${currentPage}</strong>. Trong mô hình ReAct, Agent sẽ thực hiện vòng lặp Thought-Action-Observation để suy luận tự động.<br>
+                        <span class="citation-tag">📌 Trích dẫn [Trang ${currentPage}]</span>
+                    `;
+                }
+
+                chatMessages.appendChild(tutorMsgDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 600);
+        }
+    </script>
+</body>
+</html>
