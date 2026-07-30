@@ -630,37 +630,61 @@ function RealPDFViewer({ file, page, zoom, onTotalPages, onTextExtracted, hasHig
     return () => { cancelled = true; };
   }, [file.pdfUrl]);
 
-  // Render trang hiện tại vào canvas + extract text
+  // Render trang hiện tại vào canvas + render Text Layer (cho phép dùng chuột bôi đen text thật)
+  const textLayerRef = useRef(null);
+
   useEffect(() => {
     if (!pdfDocRef.current || loading) return;
     let cancelled = false;
     pdfDocRef.current.getPage(page).then((pdfPage) => {
       if (cancelled) return;
-      // Render canvas
-      const viewport = pdfPage.getViewport({ scale: 1.8 });
+      const viewport = pdfPage.getViewport({ scale: 1.5 });
       const canvas = canvasRef.current;
       if (!canvas) return;
       canvas.width = viewport.width;
       canvas.height = viewport.height;
       const ctx = canvas.getContext("2d");
+
       pdfPage.render({ canvasContext: ctx, viewport }).promise.then(() => {
         if (cancelled) return;
-        // Extract text sau khi render xong
         pdfPage.getTextContent().then((tc) => {
           if (cancelled) return;
-          const text = tc.items.map((item) => item.str).join(" ").trim();
-          onTextExtracted(page, text || "(Trang này không có text — có thể là slide hình ảnh)");
+          const fullText = tc.items.map((item) => item.str).join(" ").trim();
+          onTextExtracted(page, fullText || "(Trang này không có text — có thể là slide hình ảnh)");
+
+          // Render Text Layer đè lên Canvas
+          if (textLayerRef.current) {
+            textLayerRef.current.innerHTML = "";
+            textLayerRef.current.style.width = `${viewport.width}px`;
+            textLayerRef.current.style.height = `${viewport.height}px`;
+            pdfjsLib.renderTextLayer({
+              textContentSource: tc,
+              container: textLayerRef.current,
+              viewport: viewport,
+              textDivs: []
+            });
+          }
         });
       });
     });
     return () => { cancelled = true; };
   }, [page, loading]);
 
+  // Bắt sự kiện bôi đen văn bản bằng chuột
+  const handleMouseUp = () => {
+    const sel = window.getSelection();
+    if (sel && sel.toString().trim().length > 3) {
+      const selected = sel.toString().trim();
+      onSelectHighlight(selected);
+    }
+  };
+
   return (
     <div className="flex-1 min-h-0 flex items-center justify-center px-4 sm:px-6 py-6 overflow-auto">
       <div
         className="relative bg-white rounded-[20px] border border-blue-100 shadow-lg shadow-slate-200/60 overflow-hidden transition-transform duration-200 origin-top"
         style={{ transform: `scale(${zoom / 100})`, transformOrigin: "top center" }}
+        onMouseUp={handleMouseUp}
       >
         {loading && (
           <div className="w-[900px] h-[600px] flex flex-col items-center justify-center gap-3 text-slate-400">
@@ -676,15 +700,24 @@ function RealPDFViewer({ file, page, zoom, onTotalPages, onTextExtracted, hasHig
           </div>
         )}
         {!loading && !error && (
-          <>
-            <canvas ref={canvasRef} className="block max-w-full" />
-            {/* Overlay bôi đen */}
+          <div className="relative inline-block">
+            <canvas ref={canvasRef} className="block" />
+            <div
+              ref={textLayerRef}
+              className="pdf-text-layer absolute top-0 left-0 right-0 bottom-0 pointer-events-auto opacity-40 select-text font-sans"
+              style={{ mixBlendMode: "multiply" }}
+            />
+            {/* Simulation button nếu người dùng muốn bôi đen nhanh */}
             {!hasHighlight && (
-              <div className="absolute bottom-4 left-4 right-4 z-20">
-                <p className="text-[10px] text-slate-400 text-center bg-white/80 rounded-lg px-2 py-1">
-                  Bôi đen văn bản trong PDF rồi hỏi — hoặc gõ câu hỏi trực tiếp vào chat
-                </p>
-              </div>
+              <button
+                onClick={() => {
+                  const sampleText = pdfDocRef.current ? "Khái niệm AI Product & Vòng đời sản phẩm" : "Ví dụ đoạn văn bản được bôi đen";
+                  onSelectHighlight(sampleText);
+                }}
+                className="absolute left-4 right-4 bottom-4 z-20 px-3 py-1.5 rounded-lg border border-dashed border-amber-400 bg-amber-100/80 hover:bg-amber-200 text-[11px] font-semibold text-amber-900 text-center"
+              >
+                🖍️ Dùng chuột bôi đen trực tiếp chữ trên slide — hoặc Bấm vào đây để chọn thử đoạn mẫu
+              </button>
             )}
             {hasHighlight && (
               <div className="absolute left-4 right-4 bottom-4 z-20 px-3 py-2 rounded-lg bg-amber-200/90 border border-amber-400 text-[11px] leading-snug text-amber-900 font-medium shadow-sm">
@@ -694,7 +727,7 @@ function RealPDFViewer({ file, page, zoom, onTotalPages, onTextExtracted, hasHig
                 </div>
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>
