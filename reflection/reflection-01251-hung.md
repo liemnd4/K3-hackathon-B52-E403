@@ -20,4 +20,3 @@ Hai phiên test tôi ghi log đều do thành viên trong nhóm đóng vai ngư�
 ## Điểm tôi tự chấm
 - Prototype (UI/flow): 7/10
 - Bốn đường đi trải nghiệm thể hiện trong spec §6: 7/10
-- Validation với user thật: 4/10 (cần người ngoài nhóm thật, không chỉ đóng vai)
