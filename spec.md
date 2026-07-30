@@ -1,8 +1,8 @@
 # AI SPEC — VLearn Tutor Page-Context Fallback (Hỗ trợ ngữ cảnh slide khi không có bôi đen) · Nhóm B52
 
-Hướng: [x] A — VLearn  [ ] B — Trợ lý Học viên  [ ] C — Làn mở
-Loại: [x] Tối ưu tính năng có sẵn  [ ] Tính năng mới
+Hướng: [x] A — VLearn 
 
+Loại: [x] Tối ưu tính năng có sẵn 
 ---
 
 ## §1. User & Job
@@ -10,10 +10,10 @@ Loại: [x] Tối ưu tính năng có sẵn  [ ] Tính năng mới
 **Job executor + workflow:**
 Học viên đang trong buổi học, đang xem slide trên VLearn và muốn hỏi/tóm tắt nội dung slide nhưng gõ trực tiếp câu hỏi hoặc số trang thay vì bôi đen được đoạn văn bản thật.
 
-**Core JTBD** (không tên sản phẩm/AI):
+**Core JTBD**:
 > Khi tôi đang học và muốn xác nhận hoặc tóm tắt lại một nội dung trong slide đang xem, tôi muốn nhận được câu trả lời giải thích đúng nội dung đó kèm trích dẫn nguồn rõ ràng ngay cả khi gõ câu hỏi tự do, để tôi tiếp tục học mà không bị mất mạch và không phải tự thao tác tìm lại thủ công.
 
-**Problem statement (KHÔNG chữ AI):**
+**Problem statement:**
 > Khi học viên hỏi mà không có đoạn văn bản thật đứng sau câu hỏi (câu hỏi tổng quan, hỏi bằng số trang, hoặc "bôi đen" thực chất chỉ là câu hỏi lặp lại) — chiếm 71.9% tổng số lượt hỏi — hệ thống hỗ trợ không có căn cứ thật để xử lý. Hậu quả: 17% số lượt này bị từ chối thẳng ("không tìm thấy nội dung"), phần còn lại vẫn nhận được câu trả lời nhưng không rõ nguồn gốc (56.2% không trích trang), và tỷ lệ bị đánh giá tệ cao gấp gần 3 lần so với khi có đoạn văn bản thật (60.7% vs 21.4% down).
 
 **Evidence (Đường B — mining, log đầy đủ trong repo/eval):**
