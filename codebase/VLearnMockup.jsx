@@ -680,10 +680,10 @@ function RealPDFViewer({ file, page, zoom, onTotalPages, onTextExtracted, hasHig
   };
 
   return (
-    <div className="flex-1 min-h-0 flex items-center justify-center px-4 sm:px-6 py-6 overflow-auto">
+    <div className="flex-1 min-h-0 flex items-center justify-center p-2 sm:p-4 overflow-hidden">
       <div
-        className="relative bg-white rounded-[20px] border border-blue-100 shadow-lg shadow-slate-200/60 overflow-hidden transition-transform duration-200 origin-top"
-        style={{ transform: `scale(${zoom / 100})`, transformOrigin: "top center" }}
+        className="relative bg-white rounded-[16px] border border-blue-100 shadow-lg shadow-slate-200/60 overflow-hidden transition-all duration-300 flex items-center justify-center max-w-full max-h-full"
+        style={{ transform: `scale(${zoom / 100})`, transformOrigin: "center center" }}
         onMouseUp={handleMouseUp}
       >
         {loading && (
@@ -1279,6 +1279,15 @@ export default function App() {
   const handleSave = () => showToast("Đã lưu tài liệu");
 
   const notesForPage = notesByPage[page] ?? 0;
+
+  useEffect(() => {
+    // Tự động điều chỉnh zoom vừa vặn màn hình khi bật/tắt chatbot hoặc sidebar
+    if (assistantOpen && !assistantMinimized && isDesktop) {
+      setZoom(82);
+    } else {
+      setZoom(105);
+    }
+  }, [assistantOpen, assistantMinimized, isDesktop]);
 
   return (
     <div className={`h-screen w-full flex flex-col font-sans overflow-hidden ${dark ? "dark" : ""}`}>
