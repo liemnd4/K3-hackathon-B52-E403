@@ -113,6 +113,16 @@ function buildSlide(dayId, fileId, page, totalPages, fileName) {
   return { type: "content", topic, bullets, isLastPage };
 }
 
+// Lấy 1 đoạn nội dung thật của slide hiện tại để dùng làm "anchor" mô phỏng khi
+// học viên bấm bôi đen — tái dùng đúng nội dung slide đang hiển thị cho thật.
+function getSampleHighlight(dayId, file, page) {
+  const slide = buildSlide(dayId, file.id, page, file.pages, file.name);
+  if (slide.type === "content") return slide.bullets[0];
+  if (slide.type === "think") return slide.question;
+  if (slide.type === "outline") return slide.topics.slice(0, 2).join(" · ");
+  return `${slide.title}${slide.fileLabel ? " — " + slide.fileLabel : ""}`;
+}
+
 // ---------------------------------------------------------------------------
 // Chat mock logic
 // ---------------------------------------------------------------------------
@@ -479,8 +489,9 @@ function SlideContent({ slide, page }) {
   );
 }
 
-function PDFViewer({ dayId, file, page, zoom }) {
+function PDFViewer({ dayId, file, page, zoom, activeTool, hasHighlight, highlightedText, onSelectHighlight, onClearHighlight }) {
   const slide = useMemo(() => buildSlide(dayId, file.id, page, file.pages, file.name), [dayId, file.id, page, file.pages, file.name]);
+  const sample = useMemo(() => getSampleHighlight(dayId, file, page), [dayId, file, page]);
   return (
     <div className="flex-1 min-h-0 flex items-center justify-center px-4 sm:px-6 py-6 overflow-hidden">
       <div
@@ -495,6 +506,31 @@ function PDFViewer({ dayId, file, page, zoom }) {
           {slide.type === "outline" && <SlideOutline slide={slide} />}
           {slide.type === "content" && <SlideContent slide={slide} page={page} />}
         </div>
+
+        {/* Mô phỏng bôi đen — đúng lát cắt chính: có anchor thật hay không */}
+        {!hasHighlight && activeTool === "highlight" && (
+          <button
+            onClick={() => onSelectHighlight(sample)}
+            className="absolute left-6 right-6 bottom-6 z-20 px-3 py-2 rounded-lg border-2 border-dashed border-amber-400 bg-amber-200/20 hover:bg-amber-200/40 text-[11px] font-semibold text-amber-800 backdrop-blur-sm transition-colors text-left"
+            title="Bấm để mô phỏng bôi đen đoạn này"
+          >
+            🖍️ Bấm để bôi đen đoạn văn bản này (mô phỏng)
+          </button>
+        )}
+        {hasHighlight && (
+          <div className="absolute left-6 right-6 bottom-6 z-20 px-3 py-2 rounded-lg bg-amber-200/50 border border-amber-400 text-[11px] leading-snug text-amber-900 font-medium shadow-sm">
+            <div className="flex items-start justify-between gap-2">
+              <span>{highlightedText}</span>
+              <button
+                onClick={onClearHighlight}
+                className="flex-shrink-0 w-4 h-4 rounded-full bg-amber-500/40 hover:bg-amber-500/70 flex items-center justify-center text-[10px] leading-none"
+                title="Bỏ chọn"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -532,6 +568,20 @@ function ChatMessage({ message, onCopy, onRegenerate, onFeedback }) {
   return (
     <div className="flex justify-start">
       <div className="w-full max-w-[92%]">
+        {message.tag && (
+          <div
+            className={`inline-flex items-center gap-1.5 mb-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold ${
+              message.tag.tone === "forward"
+                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                : message.tag.tone === "warning"
+                ? "bg-amber-50 text-amber-700 border-amber-200"
+                : "bg-indigo-50 text-indigo-700 border-indigo-200"
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70" />
+            {message.tag.label}
+          </div>
+        )}
         {message.contextPage != null && (
           <p className="text-[11px] text-slate-400 mb-1.5 px-1">Ngữ cảnh: Slide trang {message.contextPage}</p>
         )}
@@ -638,7 +688,7 @@ function QuotaBar({ used, total, byok, onToggleByok }) {
   );
 }
 
-function AIChatPanel({ open, minimized, currentPage, dayId, fileName, onClose, onMinimizeToggle }) {
+function AIChatPanel({ open, minimized, currentPage, dayId, fileName, onClose, onMinimizeToggle, hasHighlight, highlightedText }) {
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
@@ -662,20 +712,37 @@ function AIChatPanel({ open, minimized, currentPage, dayId, fileName, onClose, o
     if (!byok) setQuotaUsed((q) => Math.min(quotaTotal, q + 1));
     setTimeout(() => {
       const seed = hashPage(dayId, currentPage) + trimmed.length;
-      const reply = {
-        id: `a-${Date.now()}`,
-        role: "assistant",
-        contextPage: currentPage,
-        text: getAiReply(trimmed),
-        source: `Trang ${currentPage} – ${fileName.replace(".pdf", "")}`,
-        confidence: confidenceFor(seed),
-        answered: true,
-        feedback: null,
-      };
+      const baseAnswer = getAiReply(trimmed);
+
+      // ===== LÁT CẮT CHÍNH: quyết định anchor thật/giả =====
+      const reply = hasHighlight
+        ? {
+            id: `a-${Date.now()}`,
+            role: "assistant",
+            contextPage: currentPage,
+            text: `Dựa trên đoạn bạn vừa chọn ở Trang ${currentPage}:\n"${highlightedText}"\n\n${baseAnswer}`,
+            source: `Trang ${currentPage} – ${fileName.replace(".pdf", "")}`,
+            confidence: confidenceFor(seed),
+            answered: true,
+            feedback: null,
+            tag: { label: `✅ Có căn cứ — trích dẫn Trang ${currentPage}`, tone: "forward" },
+          }
+        : {
+            id: `a-${Date.now()}`,
+            role: "assistant",
+            contextPage: currentPage,
+            text: `Bạn chưa chọn (bôi đen) đoạn văn bản cụ thể. Mình dùng nội dung Trang ${currentPage} làm ngữ cảnh để trả lời thay vì từ chối:\n\n${baseAnswer}`,
+            source: `Trang ${currentPage} – ${fileName.replace(".pdf", "")}`,
+            confidence: confidenceFor(seed),
+            answered: true,
+            feedback: null,
+            tag: { label: `⚠️ Không có đoạn chọn — dùng Trang ${currentPage} (fallback)`, tone: "warning" },
+          };
+
       setMessages((prev) => [...prev, reply]);
       setTyping(false);
     }, 1100 + Math.random() * 700);
-  }, [byok, quotaUsed, quotaTotal, dayId, currentPage, fileName]);
+  }, [byok, quotaUsed, quotaTotal, dayId, currentPage, fileName, hasHighlight, highlightedText]);
 
   const handleCopy = (text) => { if (navigator?.clipboard) navigator.clipboard.writeText(text).catch(() => {}); };
 
@@ -740,9 +807,13 @@ function AIChatPanel({ open, minimized, currentPage, dayId, fileName, onClose, o
 
       <QuotaBar used={quotaUsed} total={quotaTotal} byok={byok} onToggleByok={() => setByok((b) => !b)} />
 
-      <div className="px-5 py-2.5 border-b border-slate-100 bg-slate-50/70 shrink-0">
-        <p className="text-xs text-slate-500">
-          Đang hỗ trợ dựa trên nội dung <span className="font-semibold text-slate-700">trang {currentPage}</span>
+      <div className={`px-5 py-2.5 border-b shrink-0 ${hasHighlight ? "bg-emerald-50/70 border-emerald-100" : "bg-slate-50/70 border-slate-100"}`}>
+        <p className={`text-xs ${hasHighlight ? "text-emerald-700" : "text-slate-500"}`}>
+          {hasHighlight ? (
+            <>📌 Đã chọn đoạn văn bản ở <span className="font-semibold">trang {currentPage}</span> — trả lời sẽ trích dẫn đúng đoạn này</>
+          ) : (
+            <>Chưa chọn đoạn văn bản — đang dùng ngữ cảnh <span className="font-semibold text-slate-700">trang {currentPage}</span> (bấm công cụ Highlight trên slide để bôi đen)</>
+          )}
         </p>
       </div>
 
@@ -810,6 +881,14 @@ export default function App() {
   const [zoom, setZoom] = useState(111);
   const [activeTool, setActiveTool] = useState("read");
   const [notesByPage, setNotesByPage] = useState({ 2: 1 });
+
+  // Trạng thái anchor cho lát cắt chính: có bôi đen đoạn văn bản thật hay không.
+  const [hasHighlight, setHasHighlight] = useState(false);
+  const [highlightedText, setHighlightedText] = useState("");
+  useEffect(() => {
+    setHasHighlight(false);
+    setHighlightedText("");
+  }, [page, selectedFile]);
 
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [assistantMinimized, setAssistantMinimized] = useState(false);
@@ -893,7 +972,23 @@ export default function App() {
             />
           </div>
 
-          <PDFViewer dayId={selectedDay} file={selectedFile} page={page} zoom={zoom} />
+          <PDFViewer
+            dayId={selectedDay}
+            file={selectedFile}
+            page={page}
+            zoom={zoom}
+            activeTool={activeTool}
+            hasHighlight={hasHighlight}
+            highlightedText={highlightedText}
+            onSelectHighlight={(text) => {
+              setHasHighlight(true);
+              setHighlightedText(text);
+            }}
+            onClearHighlight={() => {
+              setHasHighlight(false);
+              setHighlightedText("");
+            }}
+          />
           <PageNavigation page={page} totalPages={selectedFile.pages} onChange={setPage} />
         </main>
       </div>
@@ -907,6 +1002,8 @@ export default function App() {
           fileName={selectedFile.name}
           onClose={() => setAssistantOpen(false)}
           onMinimizeToggle={() => setAssistantMinimized((m) => !m)}
+          hasHighlight={hasHighlight}
+          highlightedText={highlightedText}
         />
       )}
     </div>
