@@ -3,31 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VLearn AI Tutor - Interactive Prototype (CP2)</title>
+    <title>VLearn AI Tutor - Premium Prototype (CP2)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0f172a;
-            --panel-bg: #1e293b;
-            --accent-color: #38bdf8;
-            --accent-hover: #0284c7;
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
-            --border-color: #334155;
-            --user-msg: #0369a1;
-            --tutor-msg: #334155;
-            --highlight-bg: #f59e0b;
+            --bg-main: #090d16;
+            --panel-bg: rgba(22, 30, 46, 0.7);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.35);
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.3);
+            --text-title: #f8fafc;
+            --text-body: #94a3b8;
+            --user-bubble: linear-gradient(135deg, #4f46e5, #3b82f6);
+            --tutor-bubble: rgba(30, 41, 59, 0.8);
+            --highlight: #f59e0b;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            background-color: var(--bg-main);
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(56, 189, 248, 0.1) 0%, transparent 45%);
+            color: var(--text-title);
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -35,427 +43,483 @@
         }
 
         header {
-            background-color: var(--panel-bg);
-            padding: 0.75rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            padding: 0.85rem 2rem;
+            border-bottom: 1px solid var(--panel-border);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            z-index: 10;
         }
 
-        .logo {
-            font-weight: bold;
-            font-size: 1.1rem;
-            color: var(--accent-color);
+        .brand {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.25rem;
+            background: linear-gradient(135deg, #6366f1, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .badge-cp2 {
-            background-color: #166534;
+        .badge-status {
+            background: rgba(34, 197, 94, 0.15);
             color: #4ade80;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
-        .app-container {
+        .main-layout {
             display: flex;
             flex: 1;
-            height: calc(100vh - 55px);
+            height: calc(100vh - 65px);
         }
 
-        /* Slide Panel */
-        .slide-panel {
-            flex: 6;
-            background-color: #020617;
+        /* Slide Section */
+        .slide-section {
+            flex: 65;
             padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            border-right: 1px solid var(--border-color);
+            gap: 1rem;
+            border-right: 1px solid var(--panel-border);
         }
 
-        .slide-frame {
-            background-color: #1e293b;
-            border: 2px solid var(--border-color);
+        .demo-bar {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .demo-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-demo {
+            background: rgba(255, 255, 255, 0.05);
+            color: #cbd5e1;
+            border: 1px solid var(--panel-border);
+            padding: 6px 14px;
             border-radius: 8px;
-            width: 100%;
-            max-width: 800px;
-            aspect-ratio: 16/9;
-            padding: 2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .btn-demo:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+            transform: translateY(-1px);
+        }
+
+        .slide-container {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 3rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
         }
 
-        .slide-header {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: var(--accent-color);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
+        .slide-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-title);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .slide-content {
-            font-size: 1rem;
-            line-height: 1.6;
-            color: #e2e8f0;
+        .slide-body {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #cbd5e1;
         }
 
-        .highlightable {
-            padding: 2px 4px;
-            border-radius: 3px;
-            transition: all 0.2s;
+        .highlight-text {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            padding: 4px 8px;
+            border-radius: 6px;
             cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .highlightable.active {
-            background-color: var(--highlight-bg);
+        .highlight-text.active {
+            background: #f59e0b;
             color: #000;
-            font-weight: bold;
+            font-weight: 700;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
         }
 
         .slide-footer {
             display: flex;
             justify-content: space-between;
-            font-size: 0.8rem;
-            color: var(--text-sub);
-            border-top: 1px solid var(--border-color);
-            padding-top: 0.5rem;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--panel-border);
+            color: var(--text-body);
+            font-size: 0.85rem;
         }
 
-        .slide-controls {
+        .slide-nav {
             display: flex;
+            justify-content: center;
             gap: 1rem;
             align-items: center;
         }
 
-        .btn-action {
-            background-color: var(--panel-bg);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-
-        .btn-action:hover {
-            border-color: var(--accent-color);
-            color: var(--accent-color);
-        }
-
-        /* Demo Controller Overlay */
-        .demo-bar {
-            width: 100%;
-            background: #0f172a;
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px dashed #3b82f6;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .demo-title {
-            font-size: 0.75rem;
-            color: #93c5fd;
-            font-weight: bold;
-            margin-right: 4px;
-        }
-
-        /* Chat Panel */
-        .chat-panel {
-            flex: 4;
-            background-color: var(--panel-bg);
+        /* Tutor Chat Section */
+        .tutor-section {
+            flex: 35;
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
             display: flex;
             flex-direction: column;
         }
 
-        .chat-header {
-            padding: 0.8rem 1rem;
-            border-bottom: 1px solid var(--border-color);
+        .tutor-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--panel-border);
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
         }
 
-        .context-indicator {
-            font-size: 0.8rem;
-            background: #0f172a;
-            padding: 3px 8px;
-            border-radius: 12px;
-            color: var(--accent-color);
-            border: 1px solid #0284c7;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 1rem;
-            overflow-y: auto;
+        .tutor-info {
             display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
         }
 
-        .message {
-            max-width: 88%;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            line-height: 1.5;
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #38bdf8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 0.9rem;
         }
 
-        .message.user {
-            background-color: var(--user-msg);
-            align-self: flex-end;
-            border-bottom-right-radius: 2px;
-        }
-
-        .message.tutor {
-            background-color: var(--tutor-msg);
-            align-self: flex-start;
-            border-bottom-left-radius: 2px;
-        }
-
-        .citation-tag {
-            display: inline-block;
-            background-color: #0369a1;
-            color: #e0f2fe;
-            padding: 2px 6px;
-            border-radius: 4px;
+        .page-badge {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            padding: 4px 10px;
+            border-radius: 12px;
             font-size: 0.75rem;
-            font-weight: bold;
-            margin-top: 0.4rem;
+            font-weight: 700;
         }
 
-        .chat-input-area {
-            padding: 1rem;
-            border-top: 1px solid var(--border-color);
-            background-color: #0f172a;
-        }
-
-        .input-wrapper {
+        .chat-history {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
             display: flex;
-            gap: 0.5rem;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .msg-bubble {
+            max-width: 88%;
+            padding: 1rem 1.25rem;
+            border-radius: 14px;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg-bubble.user {
+            background: var(--user-bubble);
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .msg-bubble.tutor {
+            background: var(--tutor-bubble);
+            border: 1px solid var(--panel-border);
+            color: #e2e8f0;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .cite-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            color: #a5b4fc;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .chat-controls {
+            padding: 1.25rem;
+            border-top: 1px solid var(--panel-border);
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        .input-box {
+            display: flex;
+            gap: 8px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 6px 6px 6px 14px;
+            transition: all 0.25s;
+        }
+
+        .input-box:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
         }
 
         input[type="text"] {
             flex: 1;
-            background-color: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 0.65rem 0.9rem;
-            border-radius: 6px;
+            background: transparent;
+            border: none;
+            color: #fff;
             outline: none;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
 
         .btn-send {
-            background-color: var(--accent-color);
-            color: #020617;
-            font-weight: bold;
+            background: linear-gradient(135deg, #6366f1, #3b82f6);
+            color: #fff;
             border: none;
-            padding: 0.65rem 1.1rem;
-            border-radius: 6px;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 700;
             cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .selected-text-preview {
-            font-size: 0.75rem;
-            color: var(--highlight-bg);
-            margin-bottom: 4px;
-            display: none;
+        .btn-send:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">⚡ VLearn AI Tutor <span style="font-weight: normal; color: var(--text-sub);">| Interactive Prototype (CP2)</span></div>
-        <div class="badge-cp2">CP2 Working Flow ✓</div>
+        <div class="brand">
+            ✨ VLearn Adaptive Platform
+        </div>
+        <div class="badge-status">
+            Checkpoint 2 Demo Ready
+        </div>
     </header>
 
-    <div class="app-container">
+    <div class="main-layout">
         <!-- Slide View -->
-        <div class="slide-panel">
+        <div class="slide-section">
             <div class="demo-bar">
-                <span class="demo-title">🎬 THỬ 4 ĐƯỜNG TRẢI NGHIỆM:</span>
-                <button class="btn-action" onclick="runPath('happy')">1. Happy Path (Có Anchor)</button>
-                <button class="btn-action" onclick="runPath('no-anchor')">2. Page Context (Không Anchor)</button>
-                <button class="btn-action" onclick="runPath('low-conf')">3. Low-Confidence (Mơ hồ)</button>
-                <button class="btn-action" onclick="runPath('out-scope')">4. Failure (Ngoài phạm vi)</button>
+                <span class="demo-label">⚡ Test 4 Kịch Bản:</span>
+                <button class="btn-demo" onclick="runDemo('happy')">1. Happy Path (Có Anchor)</button>
+                <button class="btn-demo" onclick="runDemo('fallback')">2. Page Context (Không Anchor)</button>
+                <button class="btn-demo" onclick="runDemo('low')">3. Low Confidence (Mơ hồ)</button>
+                <button class="btn-demo" onclick="runDemo('fail')">4. Failure (Ngoài quyền)</button>
             </div>
 
-            <div class="slide-frame">
-                <div class="slide-header">Day 3: ReAct Pattern & Agentic Workflows</div>
-                <div class="slide-content">
-                    <p><strong>Trang 14: Agent Patterns Nên Tăng Dần Theo Nhu Cầu</strong></p>
-                    <br>
-                    <p><span class="highlightable" id="textReAct" onclick="toggleHighlight()">▶ ReAct Agent: Vòng lặp Thought -> Action -> Observation tự quyết định hành động tiếp theo.</span></p>
-                    <br>
-                    <p>• Augmented LLM | Prompt Chaining | Routing | Orchestrator-Worker</p>
+            <div class="slide-container">
+                <div>
+                    <div class="slide-title">
+                        <span>Day 3: Agentic Workflows</span>
+                        <span style="font-size: 0.9rem; color: var(--accent);">VinUni AI Course</span>
+                    </div>
+                    <div class="slide-body">
+                        <p style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 1rem;">Trang 14: Agent Patterns Nên Tăng Dần Theo Nhu Cầu</p>
+                        <p style="margin-bottom: 1.5rem;">
+                            <span class="highlight-text" id="hlSegment" onclick="toggleSelection()">
+                                ➔ ReAct Agent: Vòng lặp Thought ➔ Action ➔ Observation tự quyết định bước tiếp theo.
+                            </span>
+                        </p>
+                        <p style="color: var(--text-body); font-size: 0.95rem;">
+                            Cấu trúc hệ thống bao gồm: Augmented LLM • Prompt Chaining • Routing • Orchestrator-Worker.
+                        </p>
+                    </div>
                 </div>
+
                 <div class="slide-footer">
-                    <span>Khóa học AI Thực Chiến (VinUni)</span>
-                    <span id="pageDisplay">Trang 14 / 46</span>
+                    <span>Đã kết nối dữ liệu slide bản sạch</span>
+                    <span id="pageTxt" style="font-weight: 700; color: var(--accent);">Trang 14 / 46</span>
                 </div>
             </div>
 
-            <div class="slide-controls">
-                <button class="btn-action" onclick="changePage(-1)">◄ Trang trước</button>
-                <button class="btn-action" onclick="toggleHighlight()">🔍 <span id="hlBtnText">Bôi đen văn bản mẫu</span></button>
-                <button class="btn-action" onclick="changePage(1)">Trang sau ►</button>
+            <div class="slide-nav">
+                <button class="btn-demo" onclick="navPage(-1)">◄ Trang trước</button>
+                <button class="btn-demo" onclick="toggleSelection()">✨ <span id="hlState">Giả lập Bôi đen đoạn mẫu</span></button>
+                <button class="btn-demo" onclick="navPage(1)">Trang sau ►</button>
             </div>
         </div>
 
-        <!-- AI Tutor Chat View -->
-        <div class="chat-panel">
-            <div class="chat-header">
-                <div style="font-weight: 600;">🤖 AI Tutor (Trợ giảng VLearn)</div>
-                <div class="context-indicator" id="contextIndicator">📍 Trang 14</div>
+        <!-- Tutor Chat -->
+        <div class="tutor-section">
+            <div class="tutor-header">
+                <div class="tutor-info">
+                    <div class="avatar">🤖</div>
+                    <span>AI Tutor Support</span>
+                </div>
+                <div class="page-badge" id="badgePage">📍 Ngữ cảnh: Trang 14</div>
             </div>
 
-            <div class="chat-messages" id="chatMessages">
-                <div class="message tutor">
-                    Xin chào! Mình là AI Tutor. Bạn đang mở <strong>Trang 14</strong>. Bạn có thể bôi đen văn bản trên slide hoặc gõ câu hỏi tự do nhé!
+            <div class="chat-history" id="chatList">
+                <div class="msg-bubble tutor">
+                    Xin chào! Mình là AI Tutor. Mình đã tự động đồng bộ theo <strong>Trang 14</strong> của bạn. Hãy chọn 1 trong 4 kịch bản phía trên để xem demo ngay nhé!
                 </div>
             </div>
 
-            <div class="chat-input-area">
-                <div class="selected-text-preview" id="selectedPreview">📌 Đang chọn: "ReAct Agent: Vòng lặp Thought..."</div>
-                <div class="input-wrapper">
-                    <input type="text" id="userInput" placeholder="Gõ câu hỏi (VD: tóm tắt slide này)..." onkeypress="handleKeyPress(event)">
-                    <button class="btn-send" onclick="sendMessage()">Gửi</button>
+            <div class="chat-controls">
+                <div class="input-box">
+                    <input type="text" id="userMsg" placeholder="Gõ câu hỏi (hoặc bấm nút kịch bản ở trên)..." onkeypress="onKey(event)">
+                    <button class="btn-send" onclick="send()">Gửi</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let currentPage = 14;
-        let isHighlighted = false;
+        let p = 14;
+        let isHl = false;
 
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') sendMessage();
-        }
-
-        function toggleHighlight() {
-            isHighlighted = !isHighlighted;
-            const el = document.getElementById('textReAct');
-            const preview = document.getElementById('selectedPreview');
-            const btnText = document.getElementById('hlBtnText');
-
-            if (isHighlighted) {
+        function toggleSelection() {
+            isHl = !isHl;
+            const el = document.getElementById('hlSegment');
+            const txt = document.getElementById('hlState');
+            if (isHl) {
                 el.classList.add('active');
-                preview.style.display = 'block';
-                btnText.innerText = 'Bỏ bôi đen';
+                txt.innerText = "Bỏ Bôi Đen";
             } else {
                 el.classList.remove('active');
-                preview.style.display = 'none';
-                btnText.innerText = 'Bôi đen văn bản mẫu';
+                txt.innerText = "Giả lập Bôi đen đoạn mẫu";
             }
         }
 
-        function changePage(delta) {
-            currentPage += delta;
-            if (currentPage < 1) currentPage = 1;
-            document.getElementById('pageDisplay').innerText = `Trang ${currentPage} / 46`;
-            document.getElementById('contextIndicator').innerText = `📍 Trang ${currentPage}`;
-
-            // Đường đi 4: Correction - Tự động cập nhật ngữ cảnh khi đổi trang
-            addTutorMsg(`Đã chuyển sang Trang ${currentPage}. Ngữ cảnh tự động được cập nhật!`);
+        function navPage(d) {
+            p += d;
+            if (p < 1) p = 1;
+            document.getElementById('pageTxt').innerText = `Trang ${p} / 46`;
+            document.getElementById('badgePage').innerText = `📍 Ngữ cảnh: Trang ${p}`;
+            appendTutor(`Chuyển sang <strong>Trang ${p}</strong>. AI Tutor đã sẵn sàng ngữ cảnh mới!`);
         }
 
-        function runPath(type) {
-            const input = document.getElementById('userInput');
-            if (type === 'happy') {
-                if (!isHighlighted) toggleHighlight();
+        function onKey(e) { if (e.key === 'Enter') send(); }
+
+        function runDemo(mode) {
+            const input = document.getElementById('userMsg');
+            if (mode === 'happy') {
+                if (!isHl) toggleSelection();
                 input.value = "giải thích đoạn bôi đen này giúp mình";
-            } else if (type === 'no-anchor') {
-                if (isHighlighted) toggleHighlight();
+            } else if (mode === 'fallback') {
+                if (isHl) toggleSelection();
                 input.value = "tóm tắt slide này";
-            } else if (type === 'low-conf') {
-                if (isHighlighted) toggleHighlight();
+            } else if (mode === 'low') {
+                if (isHl) toggleSelection();
                 input.value = "ReAct";
-            } else if (type === 'out-scope') {
-                if (isHighlighted) toggleHighlight();
-                input.value = "tải slide này về máy làm sao?";
+            } else if (mode === 'fail') {
+                if (isHl) toggleSelection();
+                input.value = "cho tôi xin file pdf slide này để tải về";
             }
-            sendMessage();
+            send();
         }
 
-        function addTutorMsg(htmlContent) {
-            const chatMessages = document.getElementById('chatMessages');
-            const tutorMsgDiv = document.createElement('div');
-            tutorMsgDiv.className = 'message tutor';
-            tutorMsgDiv.innerHTML = htmlContent;
-            chatMessages.appendChild(tutorMsgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+        function appendTutor(html) {
+            const list = document.getElementById('chatList');
+            const div = document.createElement('div');
+            div.className = 'msg-bubble tutor';
+            div.innerHTML = html;
+            list.appendChild(div);
+            list.scrollTop = list.scrollHeight;
         }
 
-        function sendMessage() {
-            const input = document.getElementById('userInput');
-            const text = input.value.trim();
-            if (!text) return;
+        function send() {
+            const input = document.getElementById('userMsg');
+            const val = input.value.trim();
+            if (!val) return;
 
-            const chatMessages = document.getElementById('chatMessages');
-
-            // 1. Render User Message
-            const userMsgDiv = document.createElement('div');
-            userMsgDiv.className = 'message user';
-            userMsgDiv.innerText = (isHighlighted ? '[Đã bôi đen] ' : '') + text;
-            chatMessages.appendChild(userMsgDiv);
-
+            const list = document.getElementById('chatList');
+            const uDiv = document.createElement('div');
+            uDiv.className = 'msg-bubble user';
+            uDiv.innerText = (isHl ? '[Đã bôi đen] ' : '') + val;
+            list.appendChild(uDiv);
             input.value = '';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            list.scrollTop = list.scrollHeight;
 
-            // 2. Logic xử lý 4 đường trải nghiệm (CP2 Flow)
             setTimeout(() => {
-                const query = text.toLowerCase();
+                const q = val.toLowerCase();
 
-                // ĐƯỜNG 1: Happy Path (CÓ Anchor bôi đen thật)
-                if (isHighlighted) {
-                    addTutorMsg(`
-                        <strong>Giải thích đoạn bạn bôi đen:</strong><br>
-                        ReAct (Reason + Act) là kỹ thuật giúp Agent vừa suy nghĩ (Thought) vừa thực thi công cụ (Action) rồi quan sát kết quả (Observation) để tự giải quyết bài toán.<br>
-                        <span class="citation-tag">📌 Trích dẫn [Trang ${currentPage}]</span>
+                if (isHl) {
+                    appendTutor(`
+                        <strong>Giải thích đoạn bôi đen ở Trang ${p}:</strong><br>
+                        ReAct (Reasoning + Acting) là pattern cốt lõi giúp AI kết hợp giữa tư duy suy luận và gọi công cụ bên ngoài.<br>
+                        <div class="cite-tag">📌 Trích dẫn [Trang ${p}]</div>
                     `);
                     return;
                 }
 
-                // ĐƯỜNG 3: Low-confidence (Nhập quá ngắn/mơ hồ)
-                if (query === 'react' || query.length <= 5) {
-                    addTutorMsg(`
-                        Bạn đang quan tâm đến <strong>ReAct Pattern</strong> ở Trang ${currentPage} đúng không?<br>
-                        Ý bạn là muốn: (1) Giải thích khái niệm, hay (2) Ví dụ thực tế của ReAct?
+                if (q === 'react' || q.length <= 5) {
+                    appendTutor(`
+                        Bạn đang đề cập đến thuật ngữ <strong>ReAct</strong> tại Trang ${p} đúng không?<br>
+                        Bạn muốn mình: (1) Giải thích khái niệm này, hay (2) Đưa ra ví dụ mẫu code?
                     `);
                     return;
                 }
 
-                // ĐƯỜNG 4: Failure / Outside-scope (Ngoài phạm vi)
-                if (query.includes('tải') || query.includes('download') || query.includes('pdf')) {
-                    addTutorMsg(`
-                        ⚠️ Rất tiếc, mình là AI Tutor hỗ trợ kiến thức bài học và không có quyền tải file về máy. Bạn hãy kiểm tra lại trên hệ thống LMS/Canvas của trường nhé!
+                if (q.includes('tải') || q.includes('pdf') || q.includes('download')) {
+                    appendTutor(`
+                        ⚠️ <strong>Ngoài thẩm quyền:</strong> AI Tutor chỉ hỗ trợ giải đáp kiến thức trong bài. Để tải slide PDF, bạn vui lòng truy cập trang Canvas chính thức của trường nhé!
                     `);
                     return;
                 }
 
-                // ĐƯỜNG 2: Fallback Page Context (KHÔNG Anchor nhưng dùng Trang hiện tại)
-                addTutorMsg(`
-                    <strong>Tóm tắt nội dung Trang ${currentPage} (Agent Patterns):</strong><br>
-                    Slide này liệt kê các mô hình thiết kế Agent tăng dần theo nhu cầu từ Augmented LLM, Prompt Chaining đến ReAct Agent.<br>
-                    <span class="citation-tag">📌 Trích dẫn [Trang ${currentPage}]</span>
+                appendTutor(`
+                    <strong>Tóm tắt nội dung Trang ${p} (Page Context Fallback):</strong><br>
+                    Slide này giải thích các mô hình thiết kế Agent tăng dần theo nhu cầu từ Augmented LLM cho đến ReAct Agent.<br>
+                    <div class="cite-tag">📌 Trích dẫn [Trang ${p}]</div>
                 `);
-
-            }, 500);
+            }, 450);
         }
     </script>
 </body>
