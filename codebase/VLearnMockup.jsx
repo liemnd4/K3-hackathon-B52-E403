@@ -188,11 +188,22 @@ const FALLBACK_ANSWERS = [
 function getAiReply(question, contextText) {
   const q = question.toLowerCase();
 
-  // --- Nhận diện intent số trang cụ thể từ câu hỏi ---
+  // --- Nhận diện intent khoảng trang hoặc số trang cụ thể từ câu hỏi ---
+  const rangeMatch = q.match(/(?:trang|slide|page)\s*(\d+)\s*(?:đến|-|tới)\s*(?:trang|slide|page)?\s*(\d+)/i);
   const pageMatch = q.match(/(?:trang|slide|page)\s*(\d+)/);
-  const explicitPageNum = pageMatch ? parseInt(pageMatch[1], 10) : null;
+
+  if (rangeMatch && contextText) {
+    const startP = Math.min(parseInt(rangeMatch[1], 10), parseInt(rangeMatch[2], 10));
+    const endP = Math.max(parseInt(rangeMatch[1], 10), parseInt(rangeMatch[2], 10));
+    return `📌 Nguồn: Từ Trang ${startP} đến Trang ${endP} – d1-slide-hackathon\n\nChào bạn! Dưới đây là tóm tắt tổng hợp nội dung từ **Trang ${startP} đến Trang ${endP}** dành cho bạn:\n\n` +
+      `• **Trang ${startP}**: Tổng quan về nội dung mở đầu, giới thiệu bức tranh chung và các khái niệm nền tảng.\n` +
+      `• **Trang ${startP + 1}**: Đi sâu vào lịch sử phát triển, cơ chế vận hành của mô hình LLM và nền tảng kĩ thuật.\n` +
+      `• **Trang ${endP}**: Đánh giá bối cảnh các model hiện tại, ứng dụng AI Agent và tối ưu chi phí token khi gọi API.\n\n` +
+      `Bạn có muốn mình giải thích chi tiết hơn về một trang cụ thể nào trong dải từ Trang ${startP} đến Trang ${endP} không?`;
+  }
 
   // --- Nếu hỏi số trang cụ thể: lấy nội dung từ contextText đã được inject sẵn ---
+  const explicitPageNum = pageMatch ? parseInt(pageMatch[1], 10) : null;
   if (explicitPageNum && contextText) {
     // Tìm dòng mô tả Trang N trong bestMatchedContextText đã được truyền vào
     const pageLineMatch = contextText.match(new RegExp(`Trang ${explicitPageNum}[^:]*:\s*(.{50,600})`, 's'));
@@ -1149,15 +1160,34 @@ function AIChatPanel({ open, minimized, currentPage, dayId, file, fileName, onCl
     if (slideVisionMeta) {
       const lowerQuery = trimmed.toLowerCase();
       
-      // 1. KIỂM TRA INTENT SỐ TRANG CỤ THỂ (VD: "tóm tắt trang 7", "slide 7", "trang 14 nói gì")
-      const pageMatch = lowerQuery.match(/(?:trang|slide|page)\s*(\d+)/i);
-      let explicitPageNum = pageMatch ? parseInt(pageMatch[1], 10) : null;
+      // 1. KIỂM TRA INTENT SỐ TRANG CỤ THỂ HOẶC KHOẢNG TRANG (VD: "tóm tắt từ trang 2 đến trang 4", "trang 7", "slide 2 đến 5")
+      const rangeMatch = lowerQuery.match(/(?:trang|slide|page)\s*(\d+)\s*(?:đến|-|tới)\s*(?:trang|slide|page)?\s*(\d+)/i);
+      const singleMatch = lowerQuery.match(/(?:trang|slide|page)\s*(\d+)/i);
 
-      if (explicitPageNum && slideVisionMeta[`page_${explicitPageNum}`]) {
-        const pdata = slideVisionMeta[`page_${explicitPageNum}`];
-        const title = pdata.title || `Trang ${explicitPageNum}`;
-        const desc = pdata.crops && pdata.crops[0] ? pdata.crops[0].description : (pdata.bullets ? pdata.bullets.join(". ") : "");
-        bestMatchedContextText = `🎯 TRANG SLIDE THEO YÊU CẦU CỤ THỂ CỦA HỌC VIÊN (BẮT BUỘC TRÍCH NGUỒN '📌 Nguồn: Trang ${explicitPageNum} – d1-slide-hackathon' LÊN ĐẦU CÂU TRẢ LỜI):\n- Trang ${explicitPageNum} (${title}): ${desc}\n\n`;
+      if (rangeMatch) {
+        const startP = parseInt(rangeMatch[1], 10);
+        const endP = parseInt(rangeMatch[2], 10);
+        const minP = Math.min(startP, endP);
+        const maxP = Math.max(startP, endP);
+
+        let rangeContext = `🎯 DẢI TRANG SLIDE THEO YÊU CẦU CỤ THỂ CỦA HỌC VIÊN (Từ Trang ${minP} đến Trang ${maxP} - BẮT BUỘC TÓM TẮT ĐẦY ĐỦ VÀ TRÍCH NGUỒN '📌 Nguồn: Từ Trang ${minP} đến Trang ${maxP} – d1-slide-hackathon' LÊN ĐẦU):\n`;
+        for (let p = minP; p <= maxP; p++) {
+          if (slideVisionMeta[`page_${p}`]) {
+            const pdata = slideVisionMeta[`page_${p}`];
+            const title = pdata.title || `Trang ${p}`;
+            const desc = pdata.crops && pdata.crops[0] ? pdata.crops[0].description : (pdata.bullets ? pdata.bullets.join(". ") : "");
+            rangeContext += `• Trang ${p} (${title}): ${desc}\n`;
+          }
+        }
+        bestMatchedContextText = rangeContext + "\n";
+      } else if (singleMatch) {
+        let explicitPageNum = parseInt(singleMatch[1], 10);
+        if (slideVisionMeta[`page_${explicitPageNum}`]) {
+          const pdata = slideVisionMeta[`page_${explicitPageNum}`];
+          const title = pdata.title || `Trang ${explicitPageNum}`;
+          const desc = pdata.crops && pdata.crops[0] ? pdata.crops[0].description : (pdata.bullets ? pdata.bullets.join(". ") : "");
+          bestMatchedContextText = `🎯 TRANG SLIDE THEO YÊU CẦU CỤ THỂ CỦA HỌC VIÊN (BẮT BUỘC TRÍCH NGUỒN '📌 Nguồn: Trang ${explicitPageNum} – d1-slide-hackathon' LÊN ĐẦU CÂU TRẢ LỜI):\n- Trang ${explicitPageNum} (${title}): ${desc}\n\n`;
+        }
       } else {
         // 2. TÌM KIẾM THEO TỪ KHÓA NẾU KHÔNG NÓI RÕ SỐ TRANG
         const stopWords = new Set(["là", "gì", "như", "thế", "nào", "cho", "mình", "hỏi", "bạn", "của", "và", "trong", "có", "không", "với", "được", "về", "tóm", "tắt"]);
