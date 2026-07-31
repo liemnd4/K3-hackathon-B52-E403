@@ -130,7 +130,7 @@ Học viên đang trong buổi học, đang xem slide trên VLearn và muốn h�
 | Lượt | Thời điểm | Tỷ lệ % Đạt | Ghi chú & Lỗi phát hiện |
 |:---:|:---:|:---:|---|
 | **Lượt 1** | 15:00 Ngày 1 (CP3) | **75.0% (15/20)** | Lượt đo baseline mô phỏng qua quy tắc local. |
-| **Lượt 2** | 22:55 Ngày 1 (CP5) | **85.0% (17/20)** | **Chạy trực tiếp qua OpenAI API (GPT-4o-mini, Temperature = 0) + rà soát bằng mắt từng case (human-verified khớp 100% với auto-grader).** VƯỢT QUALITY BAR (80.0%). Đã khắc phục: Case #2 (dùng đúng anchor thay vì hỏi lại), Case #8 (hỏi lại đúng 1 câu, không giải thích trước). **Còn 3 case chưa đạt:** Case #9, #10 (input ngắn/mơ hồ như "AI", "cái me dùng làm gì" — model vẫn giải thích trực tiếp dù rule 7 đã ép hỏi lại trước); Case #14 (hỏi "dùng model AI nào" — model né sang chủ đề khác thay vì từ chối tường minh dù rule 8 đã ép). |
+| **Lượt 2** | 22:55 Ngày 1 (CP5) | **85.0% (17/20)** | **Chạy trực tiếp qua OpenAI API (GPT-4o-mini, Temperature = 0) + rà soát bằng mắt từng case (human-verified khớp 100% với auto-grader).** VƯỢT QUALITY BAR (80.0%). Đã khắc phục: Case #2 (dùng đúng anchor thay vì hỏi lại), Case #8 (hỏi lại đúng 1 câu, không giải thích trước). **Còn 3 case chưa đạt:** Case #9, #10 (input ngắn/mơ hồ như "AI", "cái này dùng làm gì" — model vẫn giải thích trực tiếp dù rule 7 đã ép hỏi lại trước); Case #14 (hỏi "dùng model AI nào" — model né sang chủ đề khác thay vì từ chối tường minh dù rule 8 đã ép). |
 
 ---
 
