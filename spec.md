@@ -129,8 +129,8 @@ Học viên đang trong buổi học, đang xem slide trên VLearn và muốn h�
 
 | Lượt | Thời điểm | Tỷ lệ % Đạt | Ghi chú & Lỗi phát hiện |
 |:---:|:---:|:---:|---|
-| **Lượt 1** | 15:00 Ngày 1 (CP3) | **75.0% (15/20)** | Lượt đo baseline qua quy tắc mô phỏng. |
-| **Lượt 2** | 22:55 Ngày 1 (CP5) | **90.0% (18/20)** | **Chạy trực tiếp qua OpenAI API (GPT-4o-mini).** Vượt xa Quality Bar (80.0%). Phát hiện 2 case fail (ID #8 và #9) do model vi phạm Quy tắc 7 trong System Prompt: giải thích nội dung trước rồi mới hỏi lại ở cuối thay vì dừng lại hỏi ngay từ đầu. |
+| **Lượt 1** | 15:00 Ngày 1 (CP3) | **75.0% (15/20)** | Lượt đo baseline mô phỏng qua quy tắc local. |
+| **Lượt 2** | 22:55 Ngày 1 (CP5) | **70.0% (14/20)** | **Chạy trực tiếp qua OpenAI API (GPT-4o-mini) + Rà soát bằng mắt (Human Verified).** Phát hiện 6 case chưa đạt do 3 nhóm nguyên nhân kĩ thuật: (1) Case #2 gán nhầm anchor Prompt Chaining vào slide 4 lớp prompt; (2) Case #6 & #7 test tính năng tìm chéo trang chưa được thiết kế trong prompt; (3) Case #8, #9, #10 vi phạm Quy tắc 7 (giải thích trước rồi mới hỏi lại ở cuối). |
 
 ---
 
