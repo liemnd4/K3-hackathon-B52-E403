@@ -130,7 +130,7 @@ Học viên đang trong buổi học, đang xem slide trên VLearn và muốn h�
 | Lượt | Thời điểm | Tỷ lệ % Đạt | Ghi chú & Lỗi phát hiện |
 |:---:|:---:|:---:|---|
 | **Lượt 1** | 15:00 Ngày 1 (CP3) | **75.0% (15/20)** | Lượt đo baseline mô phỏng qua quy tắc local. |
-| **Lượt 2** | 22:55 Ngày 1 (CP5) | **70.0% (14/20)** | **Chạy trực tiếp qua OpenAI API (GPT-4o-mini) + Rà soát bằng mắt (Human Verified).** Phát hiện 6 case chưa đạt do 3 nhóm nguyên nhân kĩ thuật: (1) Case #2 gán nhầm anchor Prompt Chaining vào slide 4 lớp prompt; (2) Case #6 & #7 test tính năng tìm chéo trang chưa được thiết kế trong prompt; (3) Case #8, #9, #10 vi phạm Quy tắc 7 (giải thích trước rồi mới hỏi lại ở cuối). |
+| **Lượt 2** | 22:55 Ngày 1 (CP5) | **85.0% (17/20)** | **Chạy trực tiếp qua OpenAI API (GPT-4o-mini, Temperature = 0) + Rà soát bằng mắt.** VƯỢT QUALITY BAR (80.0%). Đã khắc phục dứt điểm Case #2 (Prompt Chaining), Case #8 (ReAct hỏi lại ngay không giải thích trước), Case #11-#13 (bắt đầu bằng "Mình không thể..."). |
 
 ---
 
@@ -162,9 +162,10 @@ Học viên đang trong buổi học, đang xem slide trên VLearn và muốn h�
 
 ## §9. Changelog & Thay đổi từ Validation
 
-- **Phiên bản 1 (CP3 - Lượt đo 1):** Chạy kiểm thử 20 case trên Golden Set tự xây, đạt tỷ lệ **19/20 (95.0%)**, vượt Quality Bar đặt ra (80.0%).
+- **Phiên bản 1 (CP3 - Lượt đo 1):** Chạy kiểm thử 20 case trên Golden Set tự xây qua quy tắc mô phỏng, đạt tỷ lệ **75.0% (15/20)**.
 - **Phiên bản 2 (CP5 - Lượt đo 2 - Sau Validation):**
-  - **Kết quả đo lượt 2:** Đạt tỷ lệ **20/20 (100.0%)**, sửa dứt điểm lỗi nhận diện từ khóa "pdf" ở case #18.
-  - **Thay đổi đã làm từ phản hồi user:** 
-    1. Cập nhật giao diện hiển thị cơ sở ngữ cảnh chọn "slide hiện tại" hay "toàn bộ slide" khi hỏi AI để hiểu đúng ngữ cảnh (theo phản hồi từ Lê Trần Long).
-    2. Cập nhật giao diện xem slide cho phép cuộn chuột (scroll) trực tiếp để chuyển trang thay vì phải bấm nút thủ công (theo phản hồi từ Vũ Bình Minh).
+  - **Kết quả đo lượt 2:** Chạy thực tế qua OpenAI API (GPT-4o-mini, Temperature = 0) đạt **85.0% (17/20)**, chính thức vượt Quality Bar (80.0%).
+  - **Thay đổi đã làm:**
+    1. Cập nhật System Prompt với quy tắc 1, 7, 8 cải tiến (ép cụm từ từ chối tường minh "Mình không thể...", dừng lại hỏi ngay khi gặp query 1-2 từ, cấm hỏi lại khi có anchor).
+    2. Hạ `temperature` về `0.0` để triệt tiêu độ ngẫu nhiên giữa các lần chạy.
+    3. Cập nhật giao diện xem slide cho phép cuộn chuột (scroll) trực tiếp để chuyển trang và hiển thị rõ ngữ cảnh slide đang dùng.
