@@ -13,9 +13,9 @@
     "category": "Happy Path",
     "layer": "Happy Path",
     "input": "Prompt Chaining là gì?",
-    "anchor": "Giải phẫu một prompt: bốn lớp xếp chồng System instruction, User input, Context, Output",
+    "anchor": "Prompt Chaining: Kỹ thuật kết nối chuỗi các lời nhắc (prompt) nối tiếp nhau rõ ràng",
     "page": 28,
-    "expected": "Có giải thích cấu trúc Prompt + có citation [Trang 28]"
+    "expected": "Có giải thích Prompt Chaining + có citation [Trang 28]"
   },
   {
     "id": 3,
@@ -50,8 +50,8 @@
     "layer": "① Nguồn sự thật",
     "input": "học giả trong bong bóng là gì?",
     "anchor": "",
-    "page": 10,
-    "expected": "Quét thấy khái niệm ở trang 20 -> Trả lời + citation [Trang 20]"
+    "page": 20,
+    "expected": "Giải thích khái niệm học giả trong bong bóng trang 20 + citation [Trang 20]"
   },
   {
     "id": 7,
@@ -59,8 +59,8 @@
     "layer": "① Nguồn sự thật",
     "input": "Attention là gì",
     "anchor": "",
-    "page": 10,
-    "expected": "Quét thấy khái niệm ở trang 15 -> Trả lời + citation [Trang 15]"
+    "page": 15,
+    "expected": "Giải thích cơ chế Attention trang 15 + citation [Trang 15]"
   },
   {
     "id": 8,
