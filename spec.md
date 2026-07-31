@@ -1,7 +1,7 @@
-# AI SPEC — VLearn Tutor Page-Context Fallback (Hỗ trợ ngữ cảnh slide khi không có bôi đen) · Nhóm [XX] · Zone [X]
+# AI SPEC — VLearn Tutor Page-Context Fallback (Hỗ trợ ngữ cảnh slide khi không có bôi đen) · Nhóm B52 · Zone 4
 
-Hướng: [x] A — VLearn  [ ] B — Trợ lý Học viên  [ ] C — Làn mở
-Loại: [x] Tối ưu tính năng có sẵn  [ ] Tính năng mới
+Hướng: [x] A — VLearn 
+Loại: [x] Tối ưu tính năng có sẵn  
 
 ---
 
@@ -101,13 +101,14 @@ Học viên đang trong buổi học, đang xem slide trên VLearn và muốn h�
 |---|---|---|---|---|
 | 1 | Học viên bôi đen đúng đoạn thật | Happy path | Trả lời + trích trang | G2 |
 | 2 | Học viên gõ "tóm tắt slide này" không bôi đen | ① Nguồn sự thật | Lấy nội dung trang hiện tại trả lời + trích trang | G10, G2 |
-| 3 | Học viên yêu cầu tóm tắt cả khóa học | ① Nguồn sự thật | Nói rõ giới hạn (chỉ tóm tắt trang hiện tại), gợi ý hỏi từng phần | G2, G11 |
+| 3 | Học viên yêu cầu tóm tắt cả khóa học | ① Nguồn sự thật | Nói rõ giới hạn (chỉ tóm tắt trang hiện tại), gợi ý hỏi từng phần *(hành vi dự định — chưa có case tương ứng trong Golden Set §7; bằng chứng hiện có chỉ từ mining §1: 16/22 = 72.7% bị từ chối)* | G2, G11 |
 | 4 | Từ khóa bôi đen quá ngắn (VD "AI") | ② Mơ hồ/thiếu thông tin | Hỏi lại 1 câu để xác nhận ý định dựa trên trang hiện tại | G10 |
 | 5 | Câu hỏi trùng với nhiều khái niệm trên trang | ② Mơ hồ/thiếu thông tin | Trả lời ý chính + hỏi thêm phần còn lại | G10 |
 | 6 | Hỏi về thông tin hệ thống/API | ③ Ngoài phạm vi | Từ chối, quay lại nội dung bài học | G10 |
 | 7 | Thử prompt injection | ③ Ngoài phạm vi | Từ chối thực hiện yêu cầu | G10, G11 |
 | 8 | Trang chứa code/công thức phức tạp | ④ Đặc thù domain | Trích dẫn chính xác + báo mức tin cậy nếu không chắc | G2, G11 |
 
+**Lưu ý đối chiếu với kết quả đo (§7):** kịch bản #4 và #6 ở trên mô tả hành vi *thiết kế dự định*. Đo thật bằng Golden Set (§7) cho thấy 2 case tương ứng — #9 (input "AI"), #14 (hỏi "dùng model AI nào") — **hiện chưa đạt đúng hành vi này**: case #9 model vẫn giải thích trực tiếp thay vì hỏi lại; case #14 model né sang chủ đề khác thay vì từ chối tường minh. Đây là 2 trong 3 failure còn lại ở §7, đang tiếp tục sửa.
 ---
 
 ## §6. Bốn đường đi của trải nghiệm
@@ -129,7 +130,7 @@ Học viên đang trong buổi học, đang xem slide trên VLearn và muốn h�
 
 | Lượt | Thời điểm | Tỷ lệ % Đạt | Ghi chú & Lỗi phát hiện |
 |:---:|:---:|:---:|---|
-| **Lượt 1** | 15:00 Ngày 1 (CP3) | **75.0% (15/20)** | Lượt đo baseline mô phỏng qua quy tắc local. |
+| **Lượt 1** | 15:00 Ngày 1 (CP3) | **75.0% (15/20)** | Lượt đo đầu tiên gọi trực tiếp OpenAI API thật (chưa sửa Golden Set, chưa đồng bộ system prompt giữa script test và code sản phẩm). Một lượt riêng chạy bằng hàm mô phỏng nội bộ (không gọi AI) trước đó từng cho 95–100%, nhưng không dùng để báo cáo vì không phản ánh AI thật. |
 | **Lượt 2** | 22:55 Ngày 1 (CP5) | **85.0% (17/20)** | **Chạy trực tiếp qua OpenAI API (GPT-4o-mini, Temperature = 0) + rà soát bằng mắt từng case (human-verified khớp 100% với auto-grader).** VƯỢT QUALITY BAR (80.0%). Đã khắc phục: Case #2 (dùng đúng anchor thay vì hỏi lại), Case #8 (hỏi lại đúng 1 câu, không giải thích trước). **Còn 3 case chưa đạt:** Case #9, #10 (input ngắn/mơ hồ như "AI", "cái này dùng làm gì" — model vẫn giải thích trực tiếp dù rule 7 đã ép hỏi lại trước); Case #14 (hỏi "dùng model AI nào" — model né sang chủ đề khác thay vì từ chối tường minh dù rule 8 đã ép). |
 
 ---
@@ -162,7 +163,7 @@ Học viên đang trong buổi học, đang xem slide trên VLearn và muốn h�
 
 ## §9. Changelog & Thay đổi từ Validation
 
-- **Phiên bản 1 (CP3 - Lượt đo 1):** Chạy kiểm thử 20 case trên Golden Set tự xây qua quy tắc mô phỏng, đạt tỷ lệ **75.0% (15/20)**.
+- **Phiên bản 1 (CP3 - Lượt đo 1):** Chạy kiểm thử 20 case trên Golden Set tự xây qua OpenAI API thật, đạt tỷ lệ **75.0% (15/20)** (chưa sửa Golden Set, chưa đồng bộ system prompt).
 - **Phiên bản 2 (CP5 - Lượt đo 2 - Sau Validation):**
   - **Kết quả đo lượt 2:** Chạy thực tế qua OpenAI API (GPT-4o-mini, Temperature = 0) đạt **85.0% (17/20)**, chính thức vượt Quality Bar (80.0%).
   - **Thay đổi đã làm:**
