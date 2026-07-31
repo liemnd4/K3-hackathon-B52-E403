@@ -4,18 +4,18 @@
     "category": "Happy Path",
     "layer": "Happy Path",
     "input": "giải thích đoạn bôi đen này giúp mình",
-    "anchor": "ReAct Agent: Vòng lặp Thought -> Action -> Observation",
-    "page": 14,
-    "expected": "Có giải thích ReAct + có citation [Trang 14]"
+    "anchor": "Giải phẫu một agent: 5 bộ phận là một vòng lặp Goal, Reasoning, Tools, Action, Observation",
+    "page": 24,
+    "expected": "Có giải thích cấu trúc Agent + có citation [Trang 24]"
   },
   {
     "id": 2,
     "category": "Happy Path",
     "layer": "Happy Path",
     "input": "Prompt Chaining là gì?",
-    "anchor": "Prompt Chaining: Các bước nối tiếp nhau rõ ràng",
-    "page": 14,
-    "expected": "Có giải thích Prompt Chaining + có citation [Trang 14]"
+    "anchor": "Giải phẫu một prompt: bốn lớp xếp chồng System instruction, User input, Context, Output",
+    "page": 28,
+    "expected": "Có giải thích cấu trúc Prompt + có citation [Trang 28]"
   },
   {
     "id": 3,
@@ -24,7 +24,7 @@
     "input": "tóm tắt slide này",
     "anchor": "",
     "page": 14,
-    "expected": "Tự dùng trang 14 tóm tắt + có citation [Trang 14]"
+    "expected": "Tự dùng nội dung trang 14 (Context window) tóm tắt + có citation [Trang 14]"
   },
   {
     "id": 4,
@@ -33,7 +33,7 @@
     "input": "slide 14 nói về điều gì",
     "anchor": "",
     "page": 14,
-    "expected": "Trả lời thông tin trang 14 + có citation [Trang 14]"
+    "expected": "Trả lời thông tin về giới hạn context window của trang 14 + có citation [Trang 14]"
   },
   {
     "id": 5,
@@ -41,8 +41,8 @@
     "layer": "① Nguồn sự thật",
     "input": "nội dung chính bài hôm nay là gì",
     "anchor": "",
-    "page": 14,
-    "expected": "Tóm tắt theo ngữ cảnh trang hiện tại + trích dẫn"
+    "page": 10,
+    "expected": "Tóm tắt theo ngữ cảnh trang 10 (LLM là gì) + trích dẫn [Trang 10]"
   },
   {
     "id": 6,
@@ -50,17 +50,17 @@
     "layer": "① Nguồn sự thật",
     "input": "học giả trong bong bóng là gì?",
     "anchor": "",
-    "page": 33,
-    "expected": "Quét thấy ở trang 44 -> Trả lời + citation [Trang 44]"
+    "page": 10,
+    "expected": "Quét thấy khái niệm ở trang 20 -> Trả lời + citation [Trang 20]"
   },
   {
     "id": 7,
     "category": "Cross-page",
     "layer": "① Nguồn sự thật",
-    "input": "Multi-head attention là gì",
+    "input": "Attention là gì",
     "anchor": "",
-    "page": 26,
-    "expected": "Quét thấy ở trang 35 -> Trả lời + citation [Trang 35]"
+    "page": 10,
+    "expected": "Quét thấy khái niệm ở trang 15 -> Trả lời + citation [Trang 15]"
   },
   {
     "id": 8,
@@ -68,7 +68,7 @@
     "layer": "② Mơ hồ/thiếu thông tin",
     "input": "ReAct",
     "anchor": "",
-    "page": 14,
+    "page": 24,
     "expected": "Hỏi lại 1 câu để xác nhận ý định người học"
   },
   {
@@ -77,7 +77,7 @@
     "layer": "② Mơ hồ/thiếu thông tin",
     "input": "AI",
     "anchor": "",
-    "page": 14,
+    "page": 3,
     "expected": "Hỏi lại 1 câu thu hẹp phạm vi khái niệm AI"
   },
   {
@@ -86,7 +86,7 @@
     "layer": "② Mơ hồ/thiếu thông tin",
     "input": "cái này dùng làm gì",
     "anchor": "Agent",
-    "page": 14,
+    "page": 24,
     "expected": "Xác nhận lại khái niệm Agent trước khi giải thích"
   },
   {
@@ -129,19 +129,19 @@
     "id": 15,
     "category": "Domain Specific",
     "layer": "④ Đặc thù domain",
-    "input": "giải thích đoạn code prompt few-shot trang 14",
-    "anchor": "examples = [{'input': 'a', 'output': 'b'}]",
-    "page": 14,
-    "expected": "Giải thích chuẩn kỹ thuật Few-shot + citation"
+    "input": "giải thích cấu trúc 4 lớp prompt trang 28",
+    "anchor": "System instruction, User input, Context bổ sung, và Output mong muốn",
+    "page": 28,
+    "expected": "Giải thích chuẩn 4 lớp prompt + citation [Trang 28]"
   },
   {
     "id": 16,
     "category": "Domain Specific",
     "layer": "④ Đặc thù domain",
-    "input": "tại sao ReAct lại tốn token hơn Chatbot baseline?",
+    "input": "tại sao Agent lại tốn token hơn Chatbot baseline?",
     "anchor": "",
-    "page": 14,
-    "expected": "Giải thích lý do do vòng lặp Thought-Action-Observation"
+    "page": 24,
+    "expected": "Giải thích lý do do vòng lặp 5 bộ phận Agent + citation [Trang 24]"
   },
   {
     "id": 17,
@@ -150,16 +150,16 @@
     "input": "giải thích nghĩa chi tiết của trang 4",
     "anchor": "giải thích nghĩa chi tiết của trang 4",
     "page": 4,
-    "expected": "Nhận biết anchor giả -> dùng ngữ cảnh trang 4 + citation"
+    "expected": "Nhận biết anchor giả -> dùng ngữ cảnh trang 4 + citation [Trang 4]"
   },
   {
     "id": 18,
     "category": "Chatlog Real Case",
     "layer": "① Nguồn sự thật",
-    "input": "tóm tắt slide pdf day2 cho tôi",
+    "input": "tóm tắt slide pdf day1 cho tôi",
     "anchor": "",
     "page": 2,
-    "expected": "Tóm tắt theo ngữ cảnh trang hiện tại + trích dẫn"
+    "expected": "Tóm tắt theo ngữ cảnh trang 2 (Day 1) + trích dẫn [Trang 2]"
   },
   {
     "id": 19,
@@ -168,7 +168,7 @@
     "input": "chuyển sang trang 15 giải thích giúp mình",
     "anchor": "",
     "page": 15,
-    "expected": "Tự động cập nhật ngữ cảnh sang Trang 15"
+    "expected": "Tự động cập nhật ngữ cảnh sang Trang 15 (Attention)"
   },
   {
     "id": 20,
@@ -177,6 +177,6 @@
     "input": "không phải ý này, giải thích lại phần ví dụ",
     "anchor": "",
     "page": 14,
-    "expected": "Cho phép sửa ý và giải thích lại ví dụ trang 14"
+    "expected": "Cho phép sửa ý và giải thích lại ví dụ về Context window trang 14"
   }
 ]
