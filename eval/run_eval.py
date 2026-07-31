@@ -48,18 +48,35 @@ def has_real_anchor(anchor: str, question: str) -> bool:
     return a != q and len(anchor.strip()) >= 15
 
 
+SLIDE_METADATA_PATH = os.path.join("codebase", "src", "data", "slide_vision_metadata.json")
+SLIDE_METADATA = {}
+if os.path.exists(SLIDE_METADATA_PATH):
+    try:
+        with open(SLIDE_METADATA_PATH, encoding="utf-8") as f:
+            SLIDE_METADATA = json.load(f)
+    except Exception:
+        pass
+
+def get_page_context(page_num: int) -> str:
+    if page_num is None:
+        return "(Không xác định được trang hiện tại.)"
+    key = f"page_{page_num}"
+    if key in SLIDE_METADATA:
+        pdata = SLIDE_METADATA[key]
+        title = pdata.get("title", f"Trang {page_num}")
+        crops = pdata.get("crops", [])
+        desc = crops[0].get("description", "") if crops else ""
+        text = pdata.get("text_content", desc)
+        return f"Tiêu đề: {title}\nNội dung chi tiết trang {page_num}: {text}"
+    return f"Slide Trang {page_num} (Bài giảng AI Tutor)"
+
 def build_user_content(case: dict) -> str:
     question = case["input"]
     anchor = case.get("anchor", "")
     page = case.get("page")
     real_anchor = has_real_anchor(anchor, question)
 
-    page_context = (
-        f"(Nội dung đầy đủ của Trang {page} không có sẵn trong bộ dữ liệu test độc lập này — "
-        f"hãy trả lời tổng quát dựa trên tên bài học và LUÔN trích dẫn [Trang {page}].)"
-        if page is not None
-        else "(Không xác định được trang hiện tại trong case thử này.)"
-    )
+    page_context = get_page_context(page)
 
     if real_anchor:
         selected = f'"{anchor}"'
