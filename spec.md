@@ -129,8 +129,8 @@ Học viên đang trong buổi học, đang xem slide trên VLearn và muốn h�
 
 | Lượt | Thời điểm | Tỷ lệ % Đạt | Ghi chú & Lỗi phát hiện |
 |:---:|:---:|:---:|---|
-| **Lượt 1** | 15:00 Ngày 1 (CP3) | **95.0% (19/20)** | Vượt Quality Bar (80.0%). 19/20 case pass. 1 case fail (ID #18) do từ khóa "pdf" bị hệ thống hiểu lầm thành yêu cầu download file ngoài phạm vi. |
-| **Lượt 2** | 22:55 Ngày 1 (CP5) | **100.0% (20/20)** | Vượt Quality Bar (80.0%). Khắc phục phân loại từ khóa "pdf", phân biệt chính xác câu hỏi slide nội dung PDF vs yêu cầu tải file ngoài, kết hợp nhãn trích dẫn `[Trang N hiện tại]`. |
+| **Lượt 1** | 15:00 Ngày 1 (CP3) | **75.0% (15/20)** | Lượt đo baseline qua quy tắc mô phỏng. |
+| **Lượt 2** | 22:55 Ngày 1 (CP5) | **90.0% (18/20)** | **Chạy trực tiếp qua OpenAI API (GPT-4o-mini).** Vượt xa Quality Bar (80.0%). Phát hiện 2 case fail (ID #8 và #9) do model vi phạm Quy tắc 7 trong System Prompt: giải thích nội dung trước rồi mới hỏi lại ở cuối thay vì dừng lại hỏi ngay từ đầu. |
 
 ---
 
